@@ -78,7 +78,7 @@ namespace TeamCityHipChatUI
         private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
             // TODO: Create an appropriate data model for your problem domain to replace the sample data
-            var sampleDataGroups = await SampleDataSource.GetGroupsAsync();
+            var sampleDataGroups = await HubDataSource.GetGroupsAsync();
             this.DefaultViewModel["Groups"] = sampleDataGroups;
         }
 
@@ -100,7 +100,7 @@ namespace TeamCityHipChatUI
         /// </summary>
         private void GroupSection_ItemClick(object sender, ItemClickEventArgs e)
         {
-            var groupId = ((SampleDataGroup)e.ClickedItem).UniqueId;
+            var groupId = ((ConfigurationsGroup)e.ClickedItem).UniqueId;
             if (!Frame.Navigate(typeof(SectionPage), groupId))
             {
                 throw new Exception(this.resourceLoader.GetString("NavigationFailedExceptionMessage"));
@@ -114,7 +114,7 @@ namespace TeamCityHipChatUI
         {
             // Navigate to the appropriate destination page, configuring the new page
             // by passing required information as a navigation parameter
-            var itemId = ((SampleDataItem)e.ClickedItem).UniqueId;
+            var itemId = ((ConfigurationItem)e.ClickedItem).UniqueId;
             if (!Frame.Navigate(typeof(ItemPage), itemId))
             {
                 throw new Exception(this.resourceLoader.GetString("NavigationFailedExceptionMessage"));

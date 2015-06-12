@@ -4,11 +4,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
+using Windows.UI;
+using Windows.UI.StartScreen;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -16,6 +20,12 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+
+using HipChat.Net;
+using HipChat.Net.Http;
+using HipChat.Net.Models.Response;
+
+using Newtonsoft.Json;
 
 // The Hub Application template is documented at http://go.microsoft.com/fwlink/?LinkID=391641
 
@@ -26,8 +36,11 @@ namespace TeamCityHipChatUI
     /// </summary>
     public sealed partial class ItemPage : Page
     {
+	    private string _configuration;
         private readonly NavigationHelper navigationHelper;
         private readonly ObservableDictionary defaultViewModel = new ObservableDictionary();
+
+	    readonly HipChatClient _hipChat = new HipChatClient(new ApiConnection(new Credentials("UxgzTgsGSbHK0A0gbIdZ9l1AP7rIFZLG58WEzWzA")));
 
         public ItemPage()
         {
@@ -69,10 +82,12 @@ namespace TeamCityHipChatUI
         private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
         {
             // TODO: Create an appropriate data model for your problem domain to replace the sample data
-            var item = await SampleDataSource.GetItemAsync((string)e.NavigationParameter);
+            
+			var item = await HubDataSource.GetItemAsync((string)e.NavigationParameter);
             this.DefaultViewModel["Item"] = item;
+	        _configuration = item.Configuration;
 
-	        ToggleEnableDisable();
+	        SetStatus(item);
         }
 
 	    /// <summary>
@@ -115,15 +130,86 @@ namespace TeamCityHipChatUI
 
         #endregion
 
-	    private void RunButton_OnClick(object sender, RoutedEventArgs e)
+	    private async void RunButton_OnClick(object sender, RoutedEventArgs e)
 	    {
 		    this.RunButton.IsEnabled = false;
+
+		    SendRunCommand();
 	    }
 
-		private void ToggleEnableDisable()
+	    private async void SendRunCommand()
+	    {
+		    // get all rooms
+		    //IResponse<RoomItems<Entity>> rooms = await _hipChat.Rooms.GetAllAsync();
+
+		    // get room members
+		    //Task<IResponse<RoomItems<Mention>>> members = _hipChat.Rooms.GetMembersAsync("Aidaws");
+
+		    // send room notification
+		    await _hipChat.Rooms.SendNotificationAsync("Aidaws", "@TeamCity run " + _configuration);
+	    }
+
+		private async void SetStatus(ConfigurationItem item)
 		{
-			//TODO: ToggleEnableDisable
-			this.RunButton.IsEnabled = true;
+			// get recent room message history
+		    IResponse<RoomItems<Message>> jsonHistory = await _hipChat.Rooms.GetHistoryAsync("Aidaws");
+			StatusMessage message = GetStatusMessage(jsonHistory, _configuration);
+
+			if (IsInvalidStatusMessage(message))
+			{
+				DisableAllContent();
+				return;
+			}
+
+			StatusValue.Text = message.State.ToString();
+			if (IsRunning(message.State))
+			{
+				this.RunButton.IsEnabled = false;
+			}
+
+			if (IsFailed(message.Status))
+			{
+				this.StatusValue.Foreground = new SolidColorBrush(Colors.Red);
+			}
+			else
+			{
+				this.StatusValue.Foreground = new SolidColorBrush(Colors.DarkSeaGreen);
+			}
 		}
+
+	    private bool IsFailed(Status status)
+	    {
+		    return status == Status.Failed;
+	    }
+
+	    private bool IsRunning(State state)
+	    {
+		    return state == State.Running;
+	    }
+
+	    private bool IsInvalidStatusMessage(StatusMessage message)
+	    {
+		    if (ReferenceEquals(null, message)) return true;
+
+		    return message.Status == Status.Invalid || message.State == State.Invalid;
+	    }
+
+	    private void DisableAllContent()
+	    {
+		    this.RunButton.IsEnabled = false;
+		    this.DescriptionText.Foreground = new SolidColorBrush(Colors.DarkGray);
+		    this.StatusText.Foreground = new SolidColorBrush(Colors.DarkGray);
+		    this.StatusValue.Text = "not available";
+	    }
+
+	    private StatusMessage GetStatusMessage(IResponse<RoomItems<Message>> jsonHistory, string config)
+	    {
+		    return
+			    JsonConvert.DeserializeObject<RoomItems<Message>>(jsonHistory.Body.ToString())
+				    .Items.Where(x => x.From == "TeamCity")
+				    .Reverse()
+					.FirstOrDefault(x => x.MessageText.StartsWith(string.Format("@Clients status {0}", config)))
+				    .ToStatusObject();
+	    }
     }
 }

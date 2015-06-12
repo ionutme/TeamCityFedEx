@@ -46,12 +46,13 @@
 
 		<StackPanel Grid.Row="1" x:Name="ContentPanel" Margin="19,9.5,19,0">
 			<!--STATUS-->
-			<TextBlock x:Uid="StatusText" Text="Status" Style="{ThemeResource BaseTextBlockStyle}" Margin="0, 0, 0, 20"/>
+			<StackPanel Orientation="Horizontal" Margin="0, 0, 0, 20">
+				<TextBlock x:Name="StatusText" Text="Status: " Style="{ThemeResource BaseTextBlockStyle}" Margin="0,0,20,0"/>
+				<TextBlock x:Name="StatusValue" Text="loading..." Foreground="DimGray" Style="{ThemeResource BaseTextBlockStyle}"/>
+			</StackPanel>
 			
 			<!--DESCRIPTION-->
-			<TextBlock x:Uid="DescriptionText" Style="{ThemeResource BodyTextBlockStyle}" Height="200">
-				Lorem ipsum
-			</TextBlock>
+			<TextBlock x:Name="DescriptionText" Text="{Binding Content}" Style="{ThemeResource BodyTextBlockStyle}" Height="250"/>
 			
 			<!--RUN-->
 			<Button x:Uid="RunButton" x:Name="RunButton" Background="CornflowerBlue" Click="RunButton_OnClick">RUN</Button>
