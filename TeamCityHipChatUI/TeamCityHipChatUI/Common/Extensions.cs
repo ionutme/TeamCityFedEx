@@ -3,7 +3,7 @@ using System.Linq;
 
 using HipChat.Net.Models.Response;
 
-using TeamCityHipChatUI.Data;
+using TeamCityHipChatUI.DataModel;
 
 namespace TeamCityHipChatUI.Common
 {
@@ -13,7 +13,8 @@ namespace TeamCityHipChatUI.Common
 		 {
 			 if (ReferenceEquals(null, message)) return null;
 
-			 string[] m = message.MessageText.Split(' ').Last().Split(',');
+			 // @clients status dev success,idle
+			 string[] m = message.MessageText.Split(' ')[3].Split(',');
 			 
 			 return new StatusMessage
 			 {

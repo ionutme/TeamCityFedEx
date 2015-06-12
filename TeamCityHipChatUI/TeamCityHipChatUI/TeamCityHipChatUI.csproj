@@ -107,12 +107,20 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\BuildGray.png" />
+    <Content Include="Assets\BuildRed.png" />
+    <Content Include="Assets\BuildWhite.png" />
+    <Content Include="Assets\BuilGreen.png" />
     <Content Include="Assets\DarkGray.png" />
     <Content Include="Assets\LightGray.png" />
     <Content Include="Assets\MediumGray.png" />
     <Content Include="Assets\HubBackground.theme-dark.png" />
     <Content Include="Assets\HubBackground.theme-light.png" />
     <Content Include="Assets\Logo.scale-240.png" />
+    <Content Include="Assets\ReleaseGray.png" />
+    <Content Include="Assets\ReleaseGreen.png" />
+    <Content Include="Assets\ReleaseRed.png" />
+    <Content Include="Assets\ReleaseWhite.png" />
     <Content Include="Assets\SmallLogo.scale-240.png" />
     <Content Include="Assets\SplashScreen.scale-240.png" />
     <Content Include="Assets\Square71x71Logo.scale-240.png" />

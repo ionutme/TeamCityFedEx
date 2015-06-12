@@ -1,4 +1,4 @@
-﻿namespace TeamCityHipChatUI.Data
+﻿namespace TeamCityHipChatUI.DataModel
 {
 	/// <summary>
 	/// Generic item data model.
@@ -26,7 +26,7 @@
 
 		public override string ToString()
 		{
-			return this.Title;
+			return Title;
 		}
 	}
 }

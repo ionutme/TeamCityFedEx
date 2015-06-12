@@ -1,23 +1,9 @@
-﻿using TeamCityHipChatUI.Common;
-using TeamCityHipChatUI.Data;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Graphics.Display;
+
 using Windows.UI;
-using Windows.UI.StartScreen;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
@@ -26,6 +12,10 @@ using HipChat.Net.Http;
 using HipChat.Net.Models.Response;
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
+using TeamCityHipChatUI.Common;
+using TeamCityHipChatUI.DataModel;
 
 // The Hub Application template is documented at http://go.microsoft.com/fwlink/?LinkID=391641
 
@@ -204,12 +194,24 @@ namespace TeamCityHipChatUI
 
 	    private StatusMessage GetStatusMessage(IResponse<RoomItems<Message>> jsonHistory, string config)
 	    {
+		    Message[] messages = JsonConvert.DeserializeObject<RoomItems<Message>>(jsonHistory.Body.ToString()).Items;
+
 		    return
-			    JsonConvert.DeserializeObject<RoomItems<Message>>(jsonHistory.Body.ToString())
-				    .Items.Where(x => x.From == "TeamCity")
+			    messages.Where(x => IsTeamCityUser(x))
 				    .Reverse()
 					.FirstOrDefault(x => x.MessageText.StartsWith(string.Format("@Clients status {0}", config)))
 				    .ToStatusObject();
+	    }
+
+	    private static dynamic IsTeamCityUser(Message x)
+	    {
+			// if TeamCity user was mentioned in HipChat by someone else
+			if (x.From.GetType() == typeof(JObject))
+			{
+				return false;
+			}
+
+		    return x.From == "TeamCity";
 	    }
     }
 }

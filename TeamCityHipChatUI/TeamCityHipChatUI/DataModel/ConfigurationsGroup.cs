@@ -1,7 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 
-namespace TeamCityHipChatUI.Data
+namespace TeamCityHipChatUI.DataModel
 {
 	/// <summary>
 	/// Generic group data model.
@@ -10,12 +10,12 @@ namespace TeamCityHipChatUI.Data
 	{
 		public ConfigurationsGroup(String uniqueId, String title, String subtitle, String imagePath, String description)
 		{
-			this.UniqueId = uniqueId;
-			this.Title = title;
-			this.Subtitle = subtitle;
-			this.Description = description;
-			this.ImagePath = imagePath;
-			this.Items = new ObservableCollection<ConfigurationItem>();
+			UniqueId = uniqueId;
+			Title = title;
+			Subtitle = subtitle;
+			Description = description;
+			ImagePath = imagePath;
+			Items = new ObservableCollection<ConfigurationItem>();
 		}
 
 		public string UniqueId { get; private set; }
@@ -27,7 +27,7 @@ namespace TeamCityHipChatUI.Data
 
 		public override string ToString()
 		{
-			return this.Title;
+			return Title;
 		}
 	}
 }
