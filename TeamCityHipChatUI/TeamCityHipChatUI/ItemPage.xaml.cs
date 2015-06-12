@@ -71,9 +71,11 @@ namespace TeamCityHipChatUI
             // TODO: Create an appropriate data model for your problem domain to replace the sample data
             var item = await SampleDataSource.GetItemAsync((string)e.NavigationParameter);
             this.DefaultViewModel["Item"] = item;
+
+	        ToggleEnableDisable();
         }
 
-        /// <summary>
+	    /// <summary>
         /// Preserves state associated with this page in case the application is suspended or the
         /// page is discarded from the navigation cache.  Values must conform to the serialization
         /// requirements of <see cref="SuspensionManager.SessionState"/>.
@@ -112,5 +114,16 @@ namespace TeamCityHipChatUI
         }
 
         #endregion
+
+	    private void RunButton_OnClick(object sender, RoutedEventArgs e)
+	    {
+		    this.RunButton.IsEnabled = false;
+	    }
+
+		private void ToggleEnableDisable()
+		{
+			//TODO: ToggleEnableDisable
+			this.RunButton.IsEnabled = true;
+		}
     }
 }
