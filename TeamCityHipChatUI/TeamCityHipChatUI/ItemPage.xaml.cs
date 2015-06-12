@@ -27,7 +27,9 @@ namespace TeamCityHipChatUI
     public sealed partial class ItemPage : Page
     {
 	    private string _configuration;
-        private readonly NavigationHelper navigationHelper;
+	    private const string TeamCityUserName = "TeamCity";
+	    private const string RoomName = "Aidaws";
+	    private readonly NavigationHelper navigationHelper;
         private readonly ObservableDictionary defaultViewModel = new ObservableDictionary();
 
 	    readonly HipChatClient _hipChat = new HipChatClient(new ApiConnection(new Credentials("UxgzTgsGSbHK0A0gbIdZ9l1AP7rIFZLG58WEzWzA")));
@@ -136,13 +138,13 @@ namespace TeamCityHipChatUI
 		    //Task<IResponse<RoomItems<Mention>>> members = _hipChat.Rooms.GetMembersAsync("Aidaws");
 
 		    // send room notification
-		    await _hipChat.Rooms.SendNotificationAsync("Aidaws", "@TeamCity run " + _configuration);
+		    await _hipChat.Rooms.SendNotificationAsync(RoomName, BuildNotification());
 	    }
 
-		private async void SetStatus(ConfigurationItem item)
+	    private async void SetStatus(ConfigurationItem item)
 		{
 			// get recent room message history
-		    IResponse<RoomItems<Message>> jsonHistory = await _hipChat.Rooms.GetHistoryAsync("Aidaws");
+			IResponse<RoomItems<Message>> jsonHistory = await _hipChat.Rooms.GetHistoryAsync(RoomName);
 			StatusMessage message = GetStatusMessage(jsonHistory, _configuration);
 
 			if (IsInvalidStatusMessage(message))
@@ -165,6 +167,11 @@ namespace TeamCityHipChatUI
 			{
 				this.StatusValue.Foreground = new SolidColorBrush(Colors.DarkSeaGreen);
 			}
+		}
+
+		private string BuildNotification()
+		{
+			return string.Format("@{0} run {1}", TeamCityUserName, _configuration);
 		}
 
 	    private bool IsFailed(Status status)
@@ -211,7 +218,7 @@ namespace TeamCityHipChatUI
 				return false;
 			}
 
-		    return x.From == "TeamCity";
+		    return x.From == TeamCityUserName;
 	    }
     }
 }
