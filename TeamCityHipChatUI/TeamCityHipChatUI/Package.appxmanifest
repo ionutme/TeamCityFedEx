@@ -3,7 +3,7 @@
   <Identity Name="d13e4e22-3b18-41cc-9996-9be93ee588d1" Publisher="CN=ionut.cristea" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="d13e4e22-3b18-41cc-9996-9be93ee588d1" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
-    <DisplayName>TeamCityHipChatUI</DisplayName>
+    <DisplayName>TeamCityHipChat</DisplayName>
     <PublisherDisplayName>ionut.cristea</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -16,7 +16,7 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="TeamCityHipChatUI.App">
-      <m3:VisualElements DisplayName="TeamCityHipChatUI" Square150x150Logo="Assets\Logo.png" Square44x44Logo="Assets\SmallLogo.png" Description="TeamCityHipChatUI" ForegroundText="light" BackgroundColor="transparent">
+      <m3:VisualElements DisplayName="TeamCityHipChat" Square150x150Logo="Assets\Logo.png" Square44x44Logo="Assets\SmallLogo.png" Description="TeamCityHipChat UI" ForegroundText="light" BackgroundColor="transparent">
         <m3:DefaultTile Wide310x150Logo="Assets\WideLogo.png" Square71x71Logo="Assets\Square71x71Logo.png">
         </m3:DefaultTile>
         <m3:SplashScreen Image="Assets\SplashScreen.png" />

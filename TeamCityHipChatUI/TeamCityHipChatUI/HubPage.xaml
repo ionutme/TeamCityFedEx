@@ -2,11 +2,11 @@
     x:Class="TeamCityHipChatUI.HubPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:TeamCityHipChatUI"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Self}}"
-    d:DataContext="{Binding Source={d:DesignData Source=/DataModel/SampleData.json}}"
+	xmlns:data="using:TeamCityHipChatUI.DataModel"
+    d:DataContext="{Binding Source={d:DesignData Source=/DataModel/JsonData.json, Type=data:HubDataSource}}"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -15,7 +15,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="ConfigurationItemTemplate">
-            <Grid>
+            <Grid Margin="0,10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
@@ -34,13 +34,12 @@
         </DataTemplate>
     </Page.Resources>
 
-    <Grid x:Name="LayoutRoot">
-        <Hub x:Name="Hub" x:Uid="Hub" Header="Team City Hip Chat" Background="{ThemeResource HubBackgroundImageBrush}">
-            
-            <HubSection x:Uid="HubSection" Header="Configurations"
+	<Hub Header="Team City Hip Chat" Background="{ThemeResource HubBackgroundImageBrush}">
+		<!--SECTION 1-->
+		<HubSection x:Uid="HubSection" Header="Configurations"
                         DataContext="{Binding Groups[0]}" HeaderTemplate="{ThemeResource HubSectionHeaderTemplate}">
-                <DataTemplate>
-                    <ListView 
+			<DataTemplate>
+				<ListView 
                         AutomationProperties.AutomationId="ItemListViewSection3"
                         AutomationProperties.Name="Items In Group"
                         SelectionMode="None"
@@ -49,15 +48,16 @@
                         ItemTemplate="{StaticResource ConfigurationItemTemplate}"
                         ItemClick="ItemView_ItemClick"
                         ContinuumNavigationTransitionInfo.ExitElementContainer="True">
-                    </ListView>
-                </DataTemplate>
-            </HubSection>
-			
-			<HubSection x:Uid="AboutSection" Header="About">
-				<DataTemplate>
-					<TextBlock>
-						<TextBlock.Text>
-							Credits to AIDA WS team.
+				</ListView>
+			</DataTemplate>
+		</HubSection>
+		
+		<!--SECTION 2-->
+		<HubSection x:Uid="AboutSection" Header="About">
+			<DataTemplate>
+				<TextBlock>
+					<TextBlock.Text>
+						Credits to AIDA WS team.
 							
 							asdfasdf
 							as
@@ -65,11 +65,10 @@
 							asdf
 							as
 							asass
-						</TextBlock.Text>
-					</TextBlock>
-				</DataTemplate>
-			</HubSection>
-			
-        </Hub>
-    </Grid>
+					</TextBlock.Text>
+				</TextBlock>
+			</DataTemplate>
+		</HubSection>
+
+	</Hub>
 </Page>

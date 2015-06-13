@@ -1,124 +1,85 @@
-﻿using System;
+﻿#region Using Directives
+
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Windows.Data.Json;
-using Windows.Storage;
+using TeamCityHipChatUI.Common;
 
-// The data model defined by this file serves as a representative example of a strongly-typed
-// model.  The property names chosen coincide with data bindings in the standard item templates.
-//
-// Applications may use this model as a starting point and build on it, or discard it entirely and
-// replace it with something appropriate to their needs. If using this model, you might improve app 
-// responsiveness by initiating the data loading task in the code behind for App.xaml when the app 
-// is first launched.
+#endregion
 
 namespace TeamCityHipChatUI.DataModel
 {
 	/// <summary>
-    /// Creates a collection of groups and items with content read from a static json file.
-    /// 
-    /// HubDataSource initializes with data read from a static json file included in the 
-    /// project.  This provides sample data at both design-time and run-time.
-    /// </summary>
-    public sealed class HubDataSource
-    {
-        private static readonly HubDataSource DataSource = new HubDataSource();
-
-        private readonly ObservableCollection<ConfigurationsGroup> _groups = new ObservableCollection<ConfigurationsGroup>();
-        public ObservableCollection<ConfigurationsGroup> Groups
-        {
-            get { return this._groups; }
-        }
-
-        public static async Task<IEnumerable<ConfigurationsGroup>> GetGroupsAsync()
-        {
-            await DataSource.GetSampleDataAsync();
-
-            return DataSource.Groups;
-        }
-
-        public static async Task<ConfigurationsGroup> GetGroupAsync(string uniqueId)
-        {
-            await DataSource.GetSampleDataAsync();
-            // Simple linear search is acceptable for small data sets
-            var matches = DataSource.Groups.Where((group) => group.UniqueId.Equals(uniqueId));
-            if (matches.Count() == 1) return matches.First();
-            return null;
-        }
-
-        public static async Task<ConfigurationItem> GetItemAsync(string uniqueId)
-        {
-            await DataSource.GetSampleDataAsync();
-            // Simple linear search is acceptable for small data sets
-            var matches = DataSource.Groups.SelectMany(group => group.Items).Where((item) => item.UniqueId.Equals(uniqueId));
-            if (matches.Count() == 1) return matches.First();
-            return null;
-        }
-
-        private async Task GetSampleDataAsync()
-        {
-            if (this._groups.Count != 0)
-                return;
-
-            Uri dataUri = new Uri("ms-appx:///DataModel/SampleData.json");
-
-            StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(dataUri);
-            string jsonText = await FileIO.ReadTextAsync(file);
-            JsonObject jsonObject = JsonObject.Parse(jsonText);
-            JsonArray jsonArray = jsonObject["Groups"].GetArray();
-
-            foreach (JsonValue groupValue in jsonArray)
-            {
-                JsonObject groupObject = groupValue.GetObject();
-                ConfigurationsGroup group = new ConfigurationsGroup(groupObject["UniqueId"].GetString(),
-                                                            groupObject["Title"].GetString(),
-                                                            groupObject["Subtitle"].GetString(),
-                                                            groupObject["ImagePath"].GetString(),
-                                                            groupObject["Description"].GetString());
-
-                foreach (JsonValue itemValue in groupObject["Items"].GetArray())
-                {
-                    JsonObject itemObject = itemValue.GetObject();
-                    group.Items.Add(new ConfigurationItem(itemObject["UniqueId"].GetString(),
-                                                       itemObject["Title"].GetString(),
-                                                       itemObject["Subtitle"].GetString(),
-                                                       itemObject["ImagePath"].GetString(),
-                                                       itemObject["Description"].GetString(),
-                                                       itemObject["Content"].GetString(),
-													   itemObject["Configuration"].GetString()));
-                }
-                this.Groups.Add(group);
-            }
-        }
-    }
-
-	public class StatusMessage
+	///     Creates a collection of groups and items with content read from a static json file.
+	///     HubDataSource initializes with data read from a static json file included in the
+	///     project.  This provides sample data at both design-time and run-time.
+	/// </summary>
+	public sealed class HubDataSource : IDataSource
 	{
-		public string Configuration { get; set; }
+		public ObservableCollection<ConfigurationsGroup> Groups
+		{
+			get
+			{
+				return this.groups;
+			}
+		}
 
-		public Status Status { get; set; }
+		public static async Task<IEnumerable<ConfigurationsGroup>> GetGroupsAsync()
+		{
+			await DataSource.LoadDataAsync();
 
-		public State State { get; set; }
-	}
+			return DataSource.Groups;
+		}
 
-	public enum Status
-	{
-		Success,
+		public static async Task<ConfigurationsGroup> GetGroupAsync(string uniqueId)
+		{
+			Guard.NotNullOrEmpty(() => uniqueId, uniqueId);
 
-		Failed,
+			await DataSource.LoadDataAsync();
 
-		Invalid
-	}
+			// Simple linear search is acceptable for small data sets
+			IEnumerable<ConfigurationsGroup> matches =
+				DataSource.Groups.Where(group => group.UniqueId.Equals(uniqueId));
 
-	public enum State
-	{
-		Idle,
+			return matches.FirstOrDefault();
+		}
 
-		Running,
+		public static async Task<ConfigurationItem> GetItemAsync(string uniqueId)
+		{
+			Guard.NotNullOrEmpty(() => uniqueId, uniqueId);
 
-		Invalid
+			await DataSource.LoadDataAsync();
+
+			// Simple linear search is acceptable for small data sets
+			IEnumerable<ConfigurationItem> matches =
+				DataSource.Groups.SelectMany(group => group.Items).Where(item => item.UniqueId.Equals(uniqueId));
+
+			return matches.FirstOrDefault();
+		}
+
+		public async Task LoadDataAsync()
+		{
+			// if the groups are allready loaded, there is nothing more to do
+			if (this.groups.Any())
+			{
+				return;
+			}
+
+			await this.jsonDataSource.LoadDataAsync();
+
+			IEnumerable<ConfigurationsGroup> localGroups =
+				await this.jsonDataSource.GetConfigurationGroupsAsync();
+
+			Groups.AddRange(localGroups.ToArray());
+		}
+
+		private static readonly HubDataSource DataSource = new HubDataSource();
+
+		private readonly JsonDataSource jsonDataSource = new JsonDataSource();
+
+		private readonly ObservableCollection<ConfigurationsGroup> groups =
+			new ObservableCollection<ConfigurationsGroup>();
 	}
 }
