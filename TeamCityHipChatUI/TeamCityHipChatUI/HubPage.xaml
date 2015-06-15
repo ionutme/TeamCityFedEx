@@ -23,7 +23,7 @@
 
 				<!--<Border Background="{ThemeResource ListViewItemPlaceholderBackgroundThemeBrush}"-->
                 <Border Margin="0,9.5,0,0" Grid.Column="0" HorizontalAlignment="Left">
-                    <Image Source="{Binding ImagePath}" Stretch="UniformToFill" AutomationProperties.Name="{Binding Title}" Height="79" Width="79"/>
+					<Image x:Name="ImageTemplate" Source="{Binding ImagePath}" Stretch="UniformToFill" AutomationProperties.Name="{Binding Title}" Height="79" Width="79"/>
                 </Border>
                 <StackPanel Grid.Column="1" Margin="14.5,0,0,0">
                     <TextBlock Text="{Binding Title}" Style="{ThemeResource ListViewItemTextBlockStyle}"/>
@@ -36,7 +36,7 @@
 
 	<Hub Header="Team City Hip Chat" Background="{ThemeResource HubBackgroundImageBrush}">
 		<!--SECTION 1-->
-		<HubSection x:Uid="HubSection" Header="Configurations"
+		<HubSection x:Uid="HubSection" x:Name="HubSection" Header="Configurations"
                         DataContext="{Binding Groups[0]}" HeaderTemplate="{ThemeResource HubSectionHeaderTemplate}">
 			<DataTemplate>
 				<ListView 

@@ -101,6 +101,7 @@
     <Compile Include="ItemPage.xaml.cs">
       <DependentUpon>ItemPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Properties\Annotations1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SectionPage.xaml.cs">
       <DependentUpon>SectionPage.xaml</DependentUpon>
@@ -116,7 +117,7 @@
     <Content Include="Assets\BuildGray.png" />
     <Content Include="Assets\BuildRed.png" />
     <Content Include="Assets\BuildWhite.png" />
-    <Content Include="Assets\BuilGreen.png" />
+    <Content Include="Assets\BuildGreen.png" />
     <Content Include="Assets\DarkGray.png" />
     <Content Include="Assets\LightGray.png" />
     <Content Include="Assets\MediumGray.png" />

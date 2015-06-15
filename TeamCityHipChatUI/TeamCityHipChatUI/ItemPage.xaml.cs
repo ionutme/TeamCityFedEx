@@ -194,17 +194,35 @@ namespace TeamCityHipChatUI
 			// get recent room message history
 			IResponse<RoomItems<Message>> jsonHistory = await this.hipChat.Rooms.GetHistoryAsync(RoomName);
 			StatusMessage message = GetStatusMessage(jsonHistory);
+			await SaveItemStateAsync(item.Title, message);
 
 			if (IsInvalidMessage(message))
 			{
 				DisableAllContent();
 				return;
 			}
-
+			
 			SetStateLabelText(message.State);
 			SetStateLabelColor(message.Status);
 
 			ToggleEnableDisableRunButton(message.State);
+		}
+
+		private async Task SaveItemStateAsync(string itemTitle, StatusMessage message)
+		{
+			Status messageStatus = ReferenceEquals(null, message) ? Status.Invalid : message.Status;
+			switch (itemTitle)
+			{
+				case "Build":
+					HubDataSource.LastBuildStatus = messageStatus;
+					break;
+				case "Release":
+					HubDataSource.LastReleaseStatus = messageStatus;
+					break;
+			}
+
+			HubDataSource.LastState = ReferenceEquals(null, message) ? State.Invalid : message.State;
+			HubDataSource.LastDateTime = DateTime.Now;
 		}
 
 		private StatusMessage GetStatusMessage(IResponse<RoomItems<Message>> jsonHistory)

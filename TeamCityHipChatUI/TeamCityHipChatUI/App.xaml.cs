@@ -32,6 +32,7 @@ namespace TeamCityHipChatUI
 		public App()
 		{
 			InitializeComponent();
+
 			Suspending += OnSuspending;
 		}
 
@@ -122,6 +123,7 @@ namespace TeamCityHipChatUI
 			var rootFrame = sender as Frame;
 			rootFrame.ContentTransitions = this.transitions ??
 			                               new TransitionCollection { new NavigationThemeTransition() };
+
 			rootFrame.Navigated -= RootFrame_FirstNavigated;
 		}
 
@@ -135,7 +137,9 @@ namespace TeamCityHipChatUI
 		private async void OnSuspending(object sender, SuspendingEventArgs e)
 		{
 			SuspendingDeferral deferral = e.SuspendingOperation.GetDeferral();
+
 			await SuspensionManager.SaveAsync();
+
 			deferral.Complete();
 		}
 	}

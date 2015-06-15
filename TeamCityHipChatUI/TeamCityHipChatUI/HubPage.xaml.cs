@@ -2,6 +2,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 using Windows.ApplicationModel.Resources;
 using Windows.Graphics.Display;
@@ -80,9 +82,46 @@ namespace TeamCityHipChatUI
 		/// </param>
 		private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
 		{
-			// TODO: Create an appropriate data model for your problem domain to replace the sample data
-			IEnumerable<ConfigurationsGroup> dataGroups = await HubDataSource.GetGroupsAsync();
+			ObservableCollection<ConfigurationsGroup> dataGroups = await HubDataSource.GetGroupsAsync();
+			
+			LoadLastItemsState(dataGroups.Single().Items);
+
 			DefaultViewModel["Groups"] = dataGroups;
+		}
+
+		private void LoadLastItemsState(ObservableCollection<ConfigurationItem> items)
+		{
+			foreach (ConfigurationItem item in items)
+			{
+				switch (item.Title)
+				{
+					case "Build":
+						SetImagePath(item, HubDataSource.LastBuildStatus);
+						break;
+					case "Release":
+						SetImagePath(item, HubDataSource.LastReleaseStatus);
+						break;
+				}
+			}
+		}
+
+		private static void SetImagePath(ConfigurationItem item, Status? status)
+		{
+			switch (status)
+			{
+				case Status.Failed:
+					item.ImagePath = string.Format("Assets/{0}Red.png", item.Title);
+					break;
+				case Status.Success:
+					item.ImagePath = string.Format("Assets/{0}Green.png", item.Title);
+					break;
+				case Status.Invalid:
+					item.ImagePath = string.Format("Assets/{0}Gray.png", item.Title);
+					break;
+				default:
+					item.ImagePath = string.Format("Assets/{0}White.png", item.Title);
+					break;
+			}
 		}
 
 		/// <summary>
