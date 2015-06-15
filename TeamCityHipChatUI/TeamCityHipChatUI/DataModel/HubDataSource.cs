@@ -75,6 +75,16 @@ namespace TeamCityHipChatUI.DataModel
 			Groups.AddRange(localGroups.ToArray());
 		}
 
+		public static async Task SaveItemAsync(ConfigurationItem item)
+		{
+			await DataSource.SaveDataAsync(item);
+		}
+
+		public async Task SaveDataAsync(ConfigurationItem item)
+		{
+			await this.jsonDataSource.SaveDataAsync(item);
+		}
+
 		private static readonly HubDataSource DataSource = new HubDataSource();
 
 		private readonly JsonDataSource jsonDataSource = new JsonDataSource();

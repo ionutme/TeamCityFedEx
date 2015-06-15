@@ -3,6 +3,8 @@
 using System;
 using System.Collections.ObjectModel;
 
+using Newtonsoft.Json;
+
 #endregion
 
 namespace TeamCityHipChatUI.DataModel
@@ -27,17 +29,23 @@ namespace TeamCityHipChatUI.DataModel
 			Items = new ObservableCollection<ConfigurationItem>();
 		}
 
-		public string UniqueId { get; private set; }
+		[JsonProperty("UniqueId")]
+		public string UniqueId { get; set; }
 
-		public string Title { get; private set; }
+		[JsonProperty("Title")]
+		public string Title { get; set; }
 
-		public string Subtitle { get; private set; }
+		[JsonProperty("Subtitle")]
+		public string Subtitle { get; set; }
 
-		public string Description { get; private set; }
+		[JsonProperty("Description")]
+		public string Description { get; set; }
 
-		public string ImagePath { get; private set; }
+		[JsonProperty("ImagePath")]
+		public string ImagePath { get; set; }
 
-		public ObservableCollection<ConfigurationItem> Items { get; private set; }
+		[JsonProperty("Items")]
+		public ObservableCollection<ConfigurationItem> Items { get; set; }
 
 		public override string ToString()
 		{

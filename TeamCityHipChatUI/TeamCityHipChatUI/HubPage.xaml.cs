@@ -2,25 +2,28 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
 
 using Windows.ApplicationModel.Resources;
 using Windows.Graphics.Display;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 
+using TeamCityHipChatUI.Annotations;
 using TeamCityHipChatUI.Common;
 using TeamCityHipChatUI.DataModel;
 
 #endregion
-
-// The Hub Application template is documented at http://go.microsoft.com/fwlink/?LinkId=391641
 
 namespace TeamCityHipChatUI
 {
 	/// <summary>
 	///     A page that displays a grouped collection of items.
 	/// </summary>
-	public sealed partial class HubPage : Page
+	public sealed partial class HubPage : Page, INotifyPropertyChanged
 	{
 		private readonly NavigationHelper navigationHelper;
 
@@ -80,9 +83,29 @@ namespace TeamCityHipChatUI
 		/// </param>
 		private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
 		{
-			// TODO: Create an appropriate data model for your problem domain to replace the sample data
 			IEnumerable<ConfigurationsGroup> dataGroups = await HubDataSource.GetGroupsAsync();
+
+			LoadLastKnownItemsState(dataGroups.FirstOrDefault().Items);
+
 			DefaultViewModel["Groups"] = dataGroups;
+
+			OnPropertyChanged("DefaultViewModel");
+		}
+
+		private void LoadLastKnownItemsState(ObservableCollection<ConfigurationItem> items)
+		{
+			foreach (ConfigurationItem item in items)
+			{
+				switch(item.LastStatus)
+				{
+					case Status.Failed:
+						item.ImagePath = item.FailedImagePath;
+						break;
+					case Status.Success:
+						 item.ImagePath = item.SuccessImagePath;
+						break;
+				}
+			}
 		}
 
 		/// <summary>
@@ -151,5 +174,17 @@ namespace TeamCityHipChatUI
 		}
 
 		#endregion
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		[NotifyPropertyChangedInvocator]
+		private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+		{
+			PropertyChangedEventHandler handler = PropertyChanged;
+			if (handler != null)
+			{
+				handler(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
 	}
 }

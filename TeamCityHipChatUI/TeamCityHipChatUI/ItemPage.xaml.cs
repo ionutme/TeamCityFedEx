@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Windows.UI;
+using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -102,13 +103,11 @@ namespace TeamCityHipChatUI
 		/// </param>
 		private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
 		{
-			ConfigurationItem item = await HubDataSource.GetItemAsync(e.NavigationParameter as string);
-			DefaultViewModel["Item"] = item;
+			this.item = await HubDataSource.GetItemAsync(e.NavigationParameter as string);
 
-			// set DEV or RELEASE
-			this.itemConfiguration = item.Configuration;
+			DefaultViewModel["Item"] = this.item;
 
-			await SetStatus(item);
+			await SetStatus(this.item);
 		}
 
 		/// <summary>
@@ -121,17 +120,60 @@ namespace TeamCityHipChatUI
 		///     Event data that provides an empty dictionary to be populated with
 		///     serializable state.
 		/// </param>
-		private void NavigationHelper_SaveState(object sender, SaveStateEventArgs e)
+		private async void NavigationHelper_SaveState(object sender, SaveStateEventArgs e)
 		{
-			// TODO: Save the unique state of the page here.
-		}
+			// Save the unique state of the page here.
 
+			await HubDataSource.SaveItemAsync(this.item);
+		}
+		
+		/// <summary>
+		/// Provides the functionality of starting the job on CI machine for the chosen configuration.
+		/// </summary>
+		/// <param name="sender">The source of the event.</param>
+		/// <param name="e">Data associated with this event.</param>
 		private async void RunButton_OnClick(object sender, RoutedEventArgs e)
 		{
-			this.RunButton.IsEnabled = false;
-
-			await SendRunCommand();
+			await ShowMessageDialogToContinue();
 		}
+
+		#region Message Dialog Methods
+
+		private async Task ShowMessageDialogToContinue()
+		{
+			var messageDialog = new MessageDialog(GetConfirmationMessage(), "Continue");
+			messageDialog.Commands.Add(new UICommand("Yes", YesCommandInvokedHandler));
+			messageDialog.Commands.Add(new UICommand("Cancel", CancelCommandInvokedHandler));
+
+			// Set the command that will be invoked by default
+			messageDialog.DefaultCommandIndex = 0;
+
+			// Set the command to be invoked when escape is pressed
+			messageDialog.CancelCommandIndex = 1;
+
+			await messageDialog.ShowAsync();
+		}
+
+		private async void YesCommandInvokedHandler(IUICommand command)
+		{
+			await SendRunCommand();
+
+			this.RunButton.IsEnabled = false;
+		}
+
+		private async void CancelCommandInvokedHandler(IUICommand command)
+		{
+			// do nothing
+		}
+
+		private string GetConfirmationMessage()
+		{
+			return string.Format(
+				"Are you sure you want to start the {0} on Team City machine?",
+				this.item.Title.ToLower());
+		}
+
+		#endregion
 
 		#endregion
 
@@ -160,6 +202,10 @@ namespace TeamCityHipChatUI
 				DisableAllContent();
 				return;
 			}
+
+			item.LastState = message.State;
+			item.LastStatus = message.Status;
+			item.LastRunDateTime = DateTime.Now;
 
 			SetStateLabelText(message.State);
 			SetStateLabelColor(message.Status);
@@ -251,18 +297,18 @@ namespace TeamCityHipChatUI
 		{
 			Guard.NotNullOrEmpty(() => ClientsAppellative, ClientsAppellative);
 			Guard.NotNullOrEmpty(() => StatusCommand, StatusCommand);
-			Guard.NotNullOrEmpty(() => this.itemConfiguration, this.itemConfiguration);
+			Guard.NotNull(() => this.item, this.item);
 
-			return string.Format("@{0} {1} {2}", ClientsAppellative, StatusCommand, this.itemConfiguration);
+			return string.Format("@{0} {1} {2}", ClientsAppellative, StatusCommand, this.item.Configuration);
 		}
 
 		private string GetRunNotification()
 		{
 			Guard.NotNullOrEmpty(() => TeamCityUserName, TeamCityUserName);
 			Guard.NotNullOrEmpty(() => RunCommand, RunCommand);
-			Guard.NotNullOrEmpty(() => this.itemConfiguration, this.itemConfiguration);
+			Guard.NotNull(() => this.item, this.item);
 
-			return string.Format("@{0} {1} {2}", TeamCityUserName, RunCommand, this.itemConfiguration);
+			return string.Format("@{0} {1} {2}", TeamCityUserName, RunCommand, this.item.Configuration);
 		}
 
 		#endregion
@@ -287,7 +333,7 @@ namespace TeamCityHipChatUI
 
 		private readonly NavigationHelper navigationHelper;
 
-		private string itemConfiguration;
+		private ConfigurationItem item;
 
 		private DateTime lastTimeStatusChecked;
 

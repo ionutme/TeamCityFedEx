@@ -20,6 +20,8 @@
         </TransitionCollection>
     </Page.Transitions>
 
+	
+	
     <Grid x:Name="LayoutRoot">
         <Grid.ChildrenTransitions>
             <TransitionCollection>

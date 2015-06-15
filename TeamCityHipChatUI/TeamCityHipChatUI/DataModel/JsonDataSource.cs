@@ -2,10 +2,13 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Windows.Data.Json;
 using Windows.Storage;
+
+using Newtonsoft.Json;
 
 #endregion
 
@@ -69,19 +72,85 @@ namespace TeamCityHipChatUI.DataModel
 				itemObject["Title"].GetString(),
 				itemObject["Subtitle"].GetString(),
 				itemObject["ImagePath"].GetString(),
+				itemObject["FailedImagePath"].GetString(),
+				itemObject["SuccessImagePath"].GetString(),
 				itemObject["Description"].GetString(),
 				itemObject["Content"].GetString(),
-				itemObject["Configuration"].GetString());
+				itemObject["Configuration"].GetString(),
+				LoadStatus(itemObject["LastStatus"]),
+				LoadState(itemObject["LastState"]),
+				LoadDateTime(itemObject["LastRunDateTime"]));
+		}
+
+		public async Task SaveDataAsync(ConfigurationItem configurationItem)
+		{
+			StorageFile file = await LoadStorageFile();
+
+			IEnumerable<ConfigurationsGroup> existingData = await GetConfigurationGroupsAsync();
+			
+			List<ConfigurationItem> updatingData = existingData.Single().Items.ToList();
+			int i = updatingData.FindIndex(x => x.UniqueId == configurationItem.UniqueId);
+			updatingData[i] = configurationItem;
+
+			FileIO.WriteTextAsync(file, await JsonConvert.SerializeObjectAsync(updatingData));
 		}
 
 		private async Task<JsonObject> GetData()
 		{
-			var dataUri = new Uri("ms-appx:///DataModel/JsonData.json");
+			StorageFile file = await LoadStorageFile();
 
-			StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(dataUri);
 			string jsonText = await FileIO.ReadTextAsync(file);
 
 			return JsonObject.Parse(jsonText);
+		}
+
+		private static async Task<StorageFile> LoadStorageFile()
+		{
+			if (!ReferenceEquals(null, StorageFile))
+			{
+				return StorageFile;
+			}
+
+			var dataUri = new Uri("ms-appx:///DataModel/JsonData.json");
+
+			StorageFile = await StorageFile.GetFileFromApplicationUriAsync(dataUri);
+
+			return StorageFile;
+		}
+
+		public static StorageFile StorageFile { get; private set; }
+
+		private DateTime LoadDateTime(IJsonValue jsonValue)
+		{
+			DateTime dateTime;
+			if (DateTime.TryParse(jsonValue.GetString(), out dateTime))
+			{
+				return dateTime;
+			}
+
+			return DateTime.MinValue;
+		}
+
+		private static State LoadState(IJsonValue jsonValue)
+		{
+			State state;
+			if (Enum.TryParse(jsonValue.GetString(), true, out state))
+			{
+				return state;
+			}
+
+			return State.Invalid;
+		}
+
+		private static Status LoadStatus(IJsonValue jsonValue)
+		{
+			Status status;
+			if (Enum.TryParse(jsonValue.GetString(), true, out status))
+			{
+				return status;
+			}
+
+			return Status.Invalid;
 		}
 
 		private static JsonObject jsonData;
