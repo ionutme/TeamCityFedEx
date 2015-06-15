@@ -23,7 +23,11 @@ namespace TeamCityHipChatUI.Common
 			XmlElement[] configNodes = GetConfigNodes(config);
 			foreach (XmlElement setting in configNodes)
 			{
-				Settings.Add(GetAttribute(setting, "key"), GetAttribute(setting, "value"));
+				string key = GetAttribute(setting, "key");
+				if (!Settings.ContainsKey(key))
+				{
+					Settings.Add(key, GetAttribute(setting, "value"));
+				}
 			}
 		}
 
