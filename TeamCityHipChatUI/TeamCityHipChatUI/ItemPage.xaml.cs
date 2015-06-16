@@ -50,6 +50,8 @@ namespace TeamCityHipChatUI
 		{
 			InitializeComponent();
 
+			//hipChatApp = new HipChatApp();
+
 			this.hipChat = new HipChatClient(new ApiConnection(new Credentials(Token)));
 
 			this.navigationHelper = new NavigationHelper(this);
@@ -189,12 +191,14 @@ namespace TeamCityHipChatUI
 			await this.hipChat.Rooms.SendNotificationAsync(RoomName, GetRunNotification());
 		}
 
-		private async Task SetStatus(ConfigurationItem item)
+		private async Task SetStatus(ConfigurationItem configurationItem)
 		{
 			// get recent room message history
 			IResponse<RoomItems<Message>> jsonHistory = await this.hipChat.Rooms.GetHistoryAsync(RoomName);
 			StatusMessage message = GetStatusMessage(jsonHistory);
-			await SaveItemStateAsync(item.Title, message);
+
+			// TODO: decide if this is needed or to use the field
+			await SaveItemStateAsync(configurationItem.Title, message);
 
 			if (IsInvalidMessage(message))
 			{
@@ -233,7 +237,10 @@ namespace TeamCityHipChatUI
 			return
 				messages.Where(x => IsTeamCityUser(x))
 					.Reverse()
-					.FirstOrDefault(x => x.MessageText.StartsWith(GetStatusNotification()))
+					.FirstOrDefault(
+						x =>
+							x.MessageText.StartsWith(GetStatusNotification()) &&
+							x.MessageText.Split(' ')[3].Split(',')[1] != "none")
 					.ToStatusObject();
 		}
 
@@ -342,6 +349,8 @@ namespace TeamCityHipChatUI
 		private readonly ObservableDictionary defaultViewModel = new ObservableDictionary();
 
 		private readonly HipChatClient hipChat;
+
+		private static HipChatApp hipChatApp;
 
 		private readonly NavigationHelper navigationHelper;
 

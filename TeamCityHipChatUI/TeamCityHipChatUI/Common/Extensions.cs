@@ -4,6 +4,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 
+using HipChat.Net.Http;
 using HipChat.Net.Models.Response;
 
 using TeamCityHipChatUI.DataModel;
@@ -22,6 +23,11 @@ namespace TeamCityHipChatUI.Common
 			}
 		}
 
+		public static string Content(this IResponse<RoomItems<Message>> roomItemsResponse)
+		{
+			return roomItemsResponse.Body.ToString();
+		}
+
 		public static StatusMessage ToStatusObject(this Message message)
 		{
 			if (ReferenceEquals(null, message))
@@ -32,8 +38,10 @@ namespace TeamCityHipChatUI.Common
 			// @clients status dev success,idle
 			string[] m = message.MessageText.Split(' ')[3].Split(',');
 
-			return new StatusMessage { Status = GetStatus(m.First()), State = GetState(m.Last()) };
+			return new StatusMessage { Status = GetStatus(m[0]), State = GetState(m[1]) };
 		}
+
+		#region Private Methods
 
 		private static Status GetStatus(string mStatus)
 		{
@@ -56,5 +64,7 @@ namespace TeamCityHipChatUI.Common
 
 			return State.Invalid;
 		}
+
+		#endregion
 	}
 }
