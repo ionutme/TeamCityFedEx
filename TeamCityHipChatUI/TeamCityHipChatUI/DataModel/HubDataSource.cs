@@ -1,6 +1,5 @@
 ﻿#region Using Directives
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -19,16 +18,6 @@ namespace TeamCityHipChatUI.DataModel
 	/// </summary>
 	public sealed class HubDataSource : IDataSource
 	{
-		public static Status? LastReleaseStatus { get; set; }
-
-		//TODO: Also add LastState and LastDateTime for Release
-
-		public static Status? LastBuildStatus { get; set; }
-
-		public static State? LastState { get; set; }
-
-		public static DateTime? LastDateTime { get; set; }
-
 		public ObservableCollection<ConfigurationsGroup> Groups
 		{
 			get
@@ -87,15 +76,10 @@ namespace TeamCityHipChatUI.DataModel
 		}
 
 		private static readonly HubDataSource DataSource = new HubDataSource();
-		
+
 		private readonly JsonDataSource jsonDataSource = new JsonDataSource();
 
 		private readonly ObservableCollection<ConfigurationsGroup> groups =
 			new ObservableCollection<ConfigurationsGroup>();
-
-		static HubDataSource()
-		{
-			LastReleaseStatus = null;
-		}
 	}
 }

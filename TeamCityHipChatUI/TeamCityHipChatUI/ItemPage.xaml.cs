@@ -165,7 +165,7 @@ namespace TeamCityHipChatUI
 		{
 			StatusMessage message = await chatService.GetStatusMessageAsync(this.item.Configuration);
 
-			await SaveItemStateAsync(this.item.Title, message);
+			this.item.LastKnownState = message;
 
 			if (IsInvalidMessage(message))
 			{
@@ -177,23 +177,6 @@ namespace TeamCityHipChatUI
 			SetStateLabelColor(message.Status);
 
 			ToggleEnableDisableRunButton(message.State);
-		}
-
-		private async Task SaveItemStateAsync(string itemTitle, StatusMessage message)
-		{
-			Status messageStatus = ReferenceEquals(null, message) ? Status.Invalid : message.Status;
-			switch (itemTitle)
-			{
-				case "Build":
-					HubDataSource.LastBuildStatus = messageStatus;
-					break;
-				case "Release":
-					HubDataSource.LastReleaseStatus = messageStatus;
-					break;
-			}
-
-			HubDataSource.LastState = ReferenceEquals(null, message) ? State.Invalid : message.State;
-			HubDataSource.LastDateTime = DateTime.Now;
 		}
 
 		private void SetStateLabelText(State state)

@@ -1,7 +1,6 @@
 ﻿#region Using Directives
 
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
@@ -83,7 +82,7 @@ namespace TeamCityHipChatUI
 		private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
 		{
 			ObservableCollection<ConfigurationsGroup> dataGroups = await HubDataSource.GetGroupsAsync();
-			
+
 			LoadLastItemsState(dataGroups.Single().Items);
 
 			DefaultViewModel["Groups"] = dataGroups;
@@ -93,15 +92,11 @@ namespace TeamCityHipChatUI
 		{
 			foreach (ConfigurationItem item in items)
 			{
-				switch (item.Title)
-				{
-					case "Build":
-						SetImagePath(item, HubDataSource.LastBuildStatus);
-						break;
-					case "Release":
-						SetImagePath(item, HubDataSource.LastReleaseStatus);
-						break;
-				}
+				Status? status = ReferenceEquals(null, item.LastKnownState)
+					? null as Status?
+					: item.LastKnownState.Status;
+
+				SetImagePath(item, status);
 			}
 		}
 

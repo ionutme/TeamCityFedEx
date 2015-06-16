@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 
 using HipChat.Net.Http;
 using HipChat.Net.Models.Response;
@@ -32,13 +31,13 @@ namespace TeamCityHipChatUI.Common
 		{
 			if (ReferenceEquals(null, message))
 			{
-				return null;
+				return new StatusMessage(Status.Invalid, State.Invalid);
 			}
 
 			// @clients status dev success,idle
 			string[] m = message.MessageText.Split(' ')[3].Split(',');
 
-			return new StatusMessage { Status = GetStatus(m[0]), State = GetState(m[1]) };
+			return new StatusMessage(GetStatus(m[0]), GetState(m[1]));
 		}
 
 		#region Private Methods

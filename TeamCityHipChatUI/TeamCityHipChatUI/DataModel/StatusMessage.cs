@@ -1,12 +1,26 @@
+#region Using Directives
+
+using System;
+
+#endregion
+
 namespace TeamCityHipChatUI.DataModel
 {
 	public class StatusMessage
 	{
-		public string Configuration { get; set; }
+		public static DateTime? CreationDate { get; private set; }
 
 		public Status Status { get; set; }
 
 		public State State { get; set; }
+
+		public StatusMessage(Status status, State state)
+		{
+			Status = status;
+			State = state;
+
+			CreationDate = DateTime.Now;
+		}
 	}
 
 	public enum Status
