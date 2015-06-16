@@ -16,11 +16,11 @@ using TeamCityHipChatUI.DataModel;
 
 namespace TeamCityHipChatUI.Common
 {
-	public class HipChatApp
+	public class ChatService
 	{
 		#region Type Initializer
 
-		static HipChatApp()
+		static ChatService()
 		{
 			Token = AppConfig.Settings["HipChatToken"];
 			RoomName = AppConfig.Settings["HipChatRoomName"];
@@ -34,7 +34,7 @@ namespace TeamCityHipChatUI.Common
 
 		#region Constructors
 
-		public HipChatApp()
+		public ChatService()
 		{
 			this.hipChatClient = new HipChatClient(CreateHipChatConnection());
 		}
@@ -52,7 +52,7 @@ namespace TeamCityHipChatUI.Common
 			return await GetStatusMessage(jsonHistory.Content(), configuration);
 		}
 
-		public async void SendNotificationAsync(string configuration)
+		public async Task SendNotificationAsync(string configuration)
 		{
 			await this.hipChatClient.Rooms.SendNotificationAsync(RoomName, GetRunNotification(configuration));
 		}

@@ -1,7 +1,6 @@
 ﻿#region Using Directives
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 using Windows.UI;
@@ -10,13 +9,6 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-
-using HipChat.Net;
-using HipChat.Net.Http;
-using HipChat.Net.Models.Response;
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 using TeamCityHipChatUI.Common;
 using TeamCityHipChatUI.DataModel;
@@ -30,29 +22,13 @@ namespace TeamCityHipChatUI
 	/// </summary>
 	public sealed partial class ItemPage : Page
 	{
-		#region Type Initializer
-
-		static ItemPage()
-		{
-			RoomName = AppConfig.Settings["HipChatRoomName"];
-			Token = AppConfig.Settings["HipChatToken"];
-			RunCommand = AppConfig.Settings["RunCommand"];
-			StatusCommand = AppConfig.Settings["StatusCommand"];
-			TeamCityUserName = AppConfig.Settings["TeamCityUser"];
-			ClientsAppellative = AppConfig.Settings["ClientsAppellative"];
-		}
-
-		#endregion
-
 		#region Constructors
 
 		public ItemPage()
 		{
 			InitializeComponent();
 
-			//hipChatApp = new HipChatApp();
-
-			this.hipChat = new HipChatClient(new ApiConnection(new Credentials(Token)));
+			chatService = new ChatService();
 
 			this.navigationHelper = new NavigationHelper(this);
 			this.navigationHelper.LoadState += NavigationHelper_LoadState;
@@ -106,10 +82,11 @@ namespace TeamCityHipChatUI
 		private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
 		{
 			this.item = await HubDataSource.GetItemAsync(e.NavigationParameter as string);
+			Guard.NotNull(() => this.item, this.item);
 
 			DefaultViewModel["Item"] = this.item;
 
-			await SetStatus(this.item);
+			await SetStatus();
 		}
 
 		/// <summary>
@@ -128,7 +105,7 @@ namespace TeamCityHipChatUI
 		}
 
 		/// <summary>
-		/// Provides the functionality of starting the job on CI machine for the chosen configuration.
+		///     Provides the functionality of starting the job on CI machine for the chosen configuration.
 		/// </summary>
 		/// <param name="sender">The source of the event.</param>
 		/// <param name="e">Data associated with this event.</param>
@@ -181,31 +158,21 @@ namespace TeamCityHipChatUI
 
 		private async Task SendRunCommand()
 		{
-			// get all rooms
-			//IResponse<RoomItems<Entity>> rooms = await _hipChat.Rooms.GetAllAsync();
-
-			// get room members
-			//Task<IResponse<RoomItems<Mention>>> members = _hipChat.Rooms.GetMembersAsync("Aidaws");
-
-			// send room notification
-			await this.hipChat.Rooms.SendNotificationAsync(RoomName, GetRunNotification());
+			await chatService.SendNotificationAsync(this.item.Configuration);
 		}
 
-		private async Task SetStatus(ConfigurationItem configurationItem)
+		private async Task SetStatus()
 		{
-			// get recent room message history
-			IResponse<RoomItems<Message>> jsonHistory = await this.hipChat.Rooms.GetHistoryAsync(RoomName);
-			StatusMessage message = GetStatusMessage(jsonHistory);
+			StatusMessage message = await chatService.GetStatusMessageAsync(this.item.Configuration);
 
-			// TODO: decide if this is needed or to use the field
-			await SaveItemStateAsync(configurationItem.Title, message);
+			await SaveItemStateAsync(this.item.Title, message);
 
 			if (IsInvalidMessage(message))
 			{
 				DisableAllContent();
 				return;
 			}
-			
+
 			SetStateLabelText(message.State);
 			SetStateLabelColor(message.Status);
 
@@ -227,21 +194,6 @@ namespace TeamCityHipChatUI
 
 			HubDataSource.LastState = ReferenceEquals(null, message) ? State.Invalid : message.State;
 			HubDataSource.LastDateTime = DateTime.Now;
-		}
-
-		private StatusMessage GetStatusMessage(IResponse<RoomItems<Message>> jsonHistory)
-		{
-			Message[] messages =
-				JsonConvert.DeserializeObject<RoomItems<Message>>(jsonHistory.Body.ToString()).Items;
-
-			return
-				messages.Where(x => IsTeamCityUser(x))
-					.Reverse()
-					.FirstOrDefault(
-						x =>
-							x.MessageText.StartsWith(GetStatusNotification()) &&
-							x.MessageText.Split(' ')[3].Split(',')[1] != "none")
-					.ToStatusObject();
 		}
 
 		private void SetStateLabelText(State state)
@@ -301,56 +253,13 @@ namespace TeamCityHipChatUI
 			this.StateValue.Text = "not available";
 		}
 
-		private static dynamic IsTeamCityUser(Message x)
-		{
-			// if TeamCity user was mentioned in HipChat by someone else
-			if (x.From.GetType() == typeof(JObject))
-			{
-				return false;
-			}
-
-			return x.From == TeamCityUserName;
-		}
-
-		private string GetStatusNotification()
-		{
-			Guard.NotNullOrEmpty(() => ClientsAppellative, ClientsAppellative);
-			Guard.NotNullOrEmpty(() => StatusCommand, StatusCommand);
-			Guard.NotNull(() => this.item, this.item);
-
-			return string.Format("@{0} {1} {2}", ClientsAppellative, StatusCommand, this.item.Configuration);
-		}
-
-		private string GetRunNotification()
-		{
-			Guard.NotNullOrEmpty(() => TeamCityUserName, TeamCityUserName);
-			Guard.NotNullOrEmpty(() => RunCommand, RunCommand);
-			Guard.NotNull(() => this.item, this.item);
-
-			return string.Format("@{0} {1} {2}", TeamCityUserName, RunCommand, this.item.Configuration);
-		}
-
 		#endregion
 
 		#region Constants and Fields
 
-		private static readonly string RoomName;
-
-		private static readonly string Token;
-
-		private static readonly string RunCommand;
-
-		private static readonly string StatusCommand;
-
-		private static readonly string TeamCityUserName;
-
-		private static readonly string ClientsAppellative;
-
 		private readonly ObservableDictionary defaultViewModel = new ObservableDictionary();
 
-		private readonly HipChatClient hipChat;
-
-		private static HipChatApp hipChatApp;
+		private static ChatService chatService;
 
 		private readonly NavigationHelper navigationHelper;
 
