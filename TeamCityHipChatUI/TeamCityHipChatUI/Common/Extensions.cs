@@ -42,10 +42,10 @@ namespace TeamCityHipChatUI.Common
 
 		#region Private Methods
 
-		private static Status GetStatus(string mStatus)
+		private static Status GetStatus(string value)
 		{
 			Status status;
-			if (Enum.TryParse(mStatus, true, out status))
+			if (Enum.TryParse(value, true, out status))
 			{
 				return status;
 			}
@@ -53,10 +53,10 @@ namespace TeamCityHipChatUI.Common
 			return Status.Invalid;
 		}
 
-		private static State GetState(string mState)
+		private static State GetState(string value)
 		{
 			State state;
-			if (Enum.TryParse(mState, true, out state))
+			if (Enum.TryParse(value, true, out state))
 			{
 				return state;
 			}

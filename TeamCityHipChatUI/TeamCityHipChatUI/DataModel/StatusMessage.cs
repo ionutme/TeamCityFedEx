@@ -8,7 +8,7 @@ namespace TeamCityHipChatUI.DataModel
 {
 	public class StatusMessage
 	{
-		public static DateTime? CreationDate { get; private set; }
+		public DateTime? CreationDate { get; private set; }
 
 		public Status Status { get; set; }
 
@@ -16,6 +16,7 @@ namespace TeamCityHipChatUI.DataModel
 
 		public StatusMessage(Status status, State state)
 		{
+			//Name = ""
 			Status = status;
 			State = state;
 

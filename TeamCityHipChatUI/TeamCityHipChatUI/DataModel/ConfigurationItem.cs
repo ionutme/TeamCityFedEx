@@ -15,6 +15,9 @@ namespace TeamCityHipChatUI.DataModel
 	public class ConfigurationItem : INotifyPropertyChanged
 	{
 		private string imagePath;
+		private string title;
+
+		private StatusMessage lastKnownState;
 
 		public ConfigurationItem(
 			string uniqueId,
@@ -26,7 +29,7 @@ namespace TeamCityHipChatUI.DataModel
 			string configuration)
 		{
 			UniqueId = uniqueId;
-			Title = title;
+			this.title = title;
 			Subtitle = subtitle;
 			Description = description;
 			this.imagePath = imagePath;
@@ -36,7 +39,18 @@ namespace TeamCityHipChatUI.DataModel
 
 		public string UniqueId { get; private set; }
 
-		public string Title { get; private set; }
+		public string Title
+		{
+			get
+			{
+				return this.title;
+			}
+			set
+			{
+				this.title = value;
+				OnPropertyChanged();
+			}
+		}
 
 		public string Subtitle { get; private set; }
 
@@ -59,7 +73,18 @@ namespace TeamCityHipChatUI.DataModel
 			}
 		}
 
-		public StatusMessage LastKnownState { get; set; }
+		public StatusMessage LastKnownState
+		{
+			get
+			{
+				return this.lastKnownState;
+			}
+			set
+			{
+				this.lastKnownState = value;
+				OnPropertyChanged();
+			}
+		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
 

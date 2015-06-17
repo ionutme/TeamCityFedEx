@@ -83,7 +83,7 @@ namespace TeamCityHipChatUI
 		{
 			ObservableCollection<ConfigurationsGroup> dataGroups = await HubDataSource.GetGroupsAsync();
 
-			LoadLastItemsState(dataGroups.Single().Items);
+			//LoadLastItemsState(dataGroups.Single().Items);
 
 			DefaultViewModel["Groups"] = dataGroups;
 		}

@@ -85,6 +85,7 @@
     <Compile Include="Common\AppConfig.cs" />
     <Compile Include="Common\Extensions.cs" />
     <Compile Include="Common\ChatService.cs" />
+    <Compile Include="Converters\StatusMessageToImagePathConverter.cs" />
     <Compile Include="netfx\System\Guard.cs" />
     <Compile Include="Common\NavigationHelper.cs" />
     <Compile Include="Common\ObservableDictionary.cs" />
