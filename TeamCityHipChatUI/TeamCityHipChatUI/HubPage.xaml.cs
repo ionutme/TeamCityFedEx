@@ -14,8 +14,6 @@ using TeamCityHipChatUI.DataModel;
 
 #endregion
 
-// The Hub Application template is documented at http://go.microsoft.com/fwlink/?LinkId=391641
-
 namespace TeamCityHipChatUI
 {
 	/// <summary>
@@ -81,42 +79,10 @@ namespace TeamCityHipChatUI
 		/// </param>
 		private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
 		{
-			ObservableCollection<ConfigurationsGroup> dataGroups = await HubDataSource.GetGroupsAsync();
+			ObservableCollection<ConfigurationGroup> configurationGroups =
+				await HubDataSource.GetGroupsAsync();
 
-			//LoadLastItemsState(dataGroups.Single().Items);
-
-			DefaultViewModel["Groups"] = dataGroups;
-		}
-
-		private void LoadLastItemsState(ObservableCollection<ConfigurationItem> items)
-		{
-			foreach (ConfigurationItem item in items)
-			{
-				Status? status = ReferenceEquals(null, item.LastKnownState)
-					? null as Status?
-					: item.LastKnownState.Status;
-
-				SetImagePath(item, status);
-			}
-		}
-
-		private static void SetImagePath(ConfigurationItem item, Status? status)
-		{
-			switch (status)
-			{
-				case Status.Failed:
-					item.ImagePath = string.Format("Assets/{0}Red.png", item.Title);
-					break;
-				case Status.Success:
-					item.ImagePath = string.Format("Assets/{0}Green.png", item.Title);
-					break;
-				case Status.Invalid:
-					item.ImagePath = string.Format("Assets/{0}Gray.png", item.Title);
-					break;
-				default:
-					item.ImagePath = string.Format("Assets/{0}White.png", item.Title);
-					break;
-			}
+			DefaultViewModel["Groups"] = configurationGroups;
 		}
 
 		/// <summary>
@@ -139,8 +105,8 @@ namespace TeamCityHipChatUI
 		/// </summary>
 		private void GroupSection_ItemClick(object sender, ItemClickEventArgs e)
 		{
-			string groupId = ((ConfigurationsGroup)e.ClickedItem).UniqueId;
-			if (!Frame.Navigate(typeof(SectionPage), groupId))
+			var group = (ConfigurationGroup)e.ClickedItem;
+			if (!Frame.Navigate(typeof(SectionPage), group.UniqueId))
 			{
 				throw new Exception(this.resourceLoader.GetString("NavigationFailedExceptionMessage"));
 			}

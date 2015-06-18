@@ -78,7 +78,7 @@ namespace TeamCityHipChatUI
 		/// </param>
 		private async void NavigationHelper_LoadState(object sender, LoadStateEventArgs e)
 		{
-			ConfigurationsGroup group = await HubDataSource.GetGroupAsync((string) e.NavigationParameter);
+			ConfigurationGroup group = await HubDataSource.GetGroupAsync((string) e.NavigationParameter);
 
 			DefaultViewModel["Group"] = group;
 		}

@@ -18,7 +18,7 @@ namespace TeamCityHipChatUI.DataModel
 			jsonData = await GetData();
 		}
 
-		public async Task<IEnumerable<ConfigurationsGroup>> GetConfigurationGroupsAsync()
+		public async Task<IEnumerable<ConfigurationGroup>> GetConfigurationGroupsAsync()
 		{
 			if (ReferenceEquals(null, jsonData))
 			{
@@ -28,13 +28,13 @@ namespace TeamCityHipChatUI.DataModel
 			return GetGroupsWithItems(jsonData["Groups"]);
 		}
 
-		private IEnumerable<ConfigurationsGroup> GetGroupsWithItems(IJsonValue jsonGroups)
+		private IEnumerable<ConfigurationGroup> GetGroupsWithItems(IJsonValue jsonGroups)
 		{
 			JsonArray jsonArray = jsonGroups.GetArray();
 			foreach (JsonValue groupValue in jsonArray)
 			{
 				JsonObject jsonGroup = groupValue.GetObject();
-				ConfigurationsGroup group = CreateConfigurationGroup(jsonGroup);
+				ConfigurationGroup group = CreateConfigurationGroup(jsonGroup);
 
 				AddJsonItemsToGroup(jsonGroup["Items"], group);
 
@@ -42,7 +42,7 @@ namespace TeamCityHipChatUI.DataModel
 			}
 		}
 
-		private void AddJsonItemsToGroup(IJsonValue jsonItems, ConfigurationsGroup group)
+		private void AddJsonItemsToGroup(IJsonValue jsonItems, ConfigurationGroup group)
 		{
 			foreach (JsonValue itemValue in jsonItems.GetArray())
 			{
@@ -52,13 +52,12 @@ namespace TeamCityHipChatUI.DataModel
 			}
 		}
 
-		private ConfigurationsGroup CreateConfigurationGroup(JsonObject groupObject)
+		private ConfigurationGroup CreateConfigurationGroup(JsonObject groupObject)
 		{
-			return new ConfigurationsGroup(
+			return new ConfigurationGroup(
 				groupObject["UniqueId"].GetString(),
 				groupObject["Title"].GetString(),
 				groupObject["Subtitle"].GetString(),
-				groupObject["ImagePath"].GetString(),
 				groupObject["Description"].GetString());
 		}
 
@@ -68,7 +67,6 @@ namespace TeamCityHipChatUI.DataModel
 				itemObject["UniqueId"].GetString(),
 				itemObject["Title"].GetString(),
 				itemObject["Subtitle"].GetString(),
-				itemObject["ImagePath"].GetString(),
 				itemObject["Description"].GetString(),
 				itemObject["Content"].GetString(),
 				itemObject["Configuration"].GetString());

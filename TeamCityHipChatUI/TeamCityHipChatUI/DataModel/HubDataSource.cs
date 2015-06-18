@@ -18,7 +18,7 @@ namespace TeamCityHipChatUI.DataModel
 	/// </summary>
 	public sealed class HubDataSource : IDataSource
 	{
-		public ObservableCollection<ConfigurationsGroup> Groups
+		public ObservableCollection<ConfigurationGroup> Groups
 		{
 			get
 			{
@@ -26,21 +26,21 @@ namespace TeamCityHipChatUI.DataModel
 			}
 		}
 
-		public static async Task<ObservableCollection<ConfigurationsGroup>> GetGroupsAsync()
+		public static async Task<ObservableCollection<ConfigurationGroup>> GetGroupsAsync()
 		{
 			await DataSource.LoadDataAsync();
 
 			return DataSource.Groups;
 		}
 
-		public static async Task<ConfigurationsGroup> GetGroupAsync(string uniqueId)
+		public static async Task<ConfigurationGroup> GetGroupAsync(string uniqueId)
 		{
 			Guard.NotNullOrEmpty(() => uniqueId, uniqueId);
 
 			await DataSource.LoadDataAsync();
 
 			// Simple linear search is acceptable for small data sets
-			IEnumerable<ConfigurationsGroup> matches =
+			IEnumerable<ConfigurationGroup> matches =
 				DataSource.Groups.Where(group => group.UniqueId.Equals(uniqueId));
 
 			return matches.FirstOrDefault();
@@ -69,7 +69,7 @@ namespace TeamCityHipChatUI.DataModel
 
 			await this.jsonDataSource.LoadDataAsync();
 
-			IEnumerable<ConfigurationsGroup> localGroups =
+			IEnumerable<ConfigurationGroup> localGroups =
 				await this.jsonDataSource.GetConfigurationGroupsAsync();
 
 			Groups.AddRange(localGroups.ToArray());
@@ -79,7 +79,7 @@ namespace TeamCityHipChatUI.DataModel
 
 		private readonly JsonDataSource jsonDataSource = new JsonDataSource();
 
-		private readonly ObservableCollection<ConfigurationsGroup> groups =
-			new ObservableCollection<ConfigurationsGroup>();
+		private readonly ObservableCollection<ConfigurationGroup> groups =
+			new ObservableCollection<ConfigurationGroup>();
 	}
 }

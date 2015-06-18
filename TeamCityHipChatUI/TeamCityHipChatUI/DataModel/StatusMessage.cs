@@ -16,7 +16,6 @@ namespace TeamCityHipChatUI.DataModel
 
 		public StatusMessage(Status status, State state)
 		{
-			//Name = ""
 			Status = status;
 			State = state;
 

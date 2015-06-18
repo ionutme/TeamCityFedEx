@@ -31,6 +31,8 @@ namespace TeamCityHipChatUI.Common
 			}
 		}
 
+		#region Private Methods
+
 		private static XmlElement[] GetConfigNodes(string config)
 		{
 			var xmlDocument = new XmlDocument();
@@ -60,5 +62,7 @@ namespace TeamCityHipChatUI.Common
 
 			return await FileIO.ReadTextAsync(file);
 		}
+
+		#endregion
 	}
 }

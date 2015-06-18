@@ -80,7 +80,7 @@ namespace TeamCityHipChatUI.Common
 					.FirstOrDefault(
 						x =>
 							x.MessageText.StartsWith(GetStatusNotification(configuration)) &&
-							x.MessageText.Split(' ')[3].Split(',')[1] != "none")
+							Extensions.GetMessageArguments(x)[1] != "none")
 					.ToStatusObject();
 		}
 

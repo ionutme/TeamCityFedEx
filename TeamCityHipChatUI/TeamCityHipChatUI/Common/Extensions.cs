@@ -35,9 +35,22 @@ namespace TeamCityHipChatUI.Common
 			}
 
 			// @clients status dev success,idle
-			string[] m = message.MessageText.Split(' ')[3].Split(',');
+			string[] args = GetMessageArguments(message);
 
-			return new StatusMessage(GetStatus(m[0]), GetState(m[1]));
+			return new StatusMessage(GetStatus(args[0]), GetState(args[1]));
+		}
+
+		/// <summary>
+		/// For a message that looks like this:
+		/// @clients status dev success,idle
+		/// , the method will return a string array
+		/// [success],[idle]
+		/// </summary>
+		/// <param name="message"></param>
+		/// <returns></returns>
+		public static string[] GetMessageArguments(Message message)
+		{
+			return message.MessageText.Split(' ')[3].Split(',');
 		}
 
 		#region Private Methods

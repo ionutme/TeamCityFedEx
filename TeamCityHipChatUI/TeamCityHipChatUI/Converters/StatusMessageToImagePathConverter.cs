@@ -5,59 +5,62 @@ using System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 
-using TeamCityHipChatUI.Common;
 using TeamCityHipChatUI.DataModel;
 
 #endregion
 
 namespace TeamCityHipChatUI.Converters
 {
-	public class StatusMessageToImagePathConverter : IValueConverter
+	public class StatusMessageToImagePathConverter : DependencyObject, IValueConverter
 	{
-		//public UserViewModel CurrentUser
-		//{
-		//	get
-		//	{
-		//		return (UserViewModel) GetValue(CurrentUserProperty);
-		//	}
-		//	set
-		//	{
-		//		SetValue(CurrentUserProperty, value);
-		//	}
-		//}
-
-		//public static readonly DependencyProperty CurrentUserProperty =
-		//DependencyProperty.Register("CurrentUser",
-		//							typeof(UserViewModel),
-		//							typeof(StatusMessageToImagePathConverter),
-		//							new PropertyMetadata(null));
-
-		public object Convert(object value, Type targetType, object parameter, string language)
+		public string ItemType
 		{
-			StatusMessage statusMessage = value as StatusMessage;
-
-			if (ReferenceEquals(null, statusMessage))
+			get
 			{
-				return string.Format("Assets/{0}White.png", parameter); 
+				return (string)GetValue(ItemTypeProperty);
 			}
+			set
+			{
+				SetValue(ItemTypeProperty, value);
+			}
+		}
 
-			switch (statusMessage.Status)
+		public static readonly DependencyProperty ItemTypeProperty =
+			DependencyProperty.Register(
+				"ItemType",
+				typeof(string),
+				typeof(StatusMessageToImagePathConverter),
+				new PropertyMetadata(null));
+
+		public object Convert(object statusMessage, Type targetType, object parameter, string language)
+		{
+			Status? status = SafeGetStatus(statusMessage);
+			switch (status)
 			{
 				case Status.Failed:
-					return string.Format("Assets/{0}Red.png", parameter);
+					return string.Format("Assets/{0}Red.png", ItemType);
 				case Status.Success:
-					return string.Format("Assets/{0}Green.png", parameter);
+					return string.Format("Assets/{0}Green.png", ItemType);
 				case Status.Invalid:
-					return string.Format("Assets/{0}Gray.png", parameter);
+					return string.Format("Assets/{0}Gray.png", ItemType);
 				default:
-					// another option that was not taken into consideration
-					return null;
+					return string.Format("Assets/{0}White.png", ItemType);
 			}
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, string language)
 		{
 			throw new NotSupportedException();
+		}
+
+		private static Status? SafeGetStatus(object statusMessage)
+		{
+			if (ReferenceEquals(null, statusMessage))
+			{
+				return null;
+			}
+
+			return ((StatusMessage)statusMessage).Status;
 		}
 	}
 }

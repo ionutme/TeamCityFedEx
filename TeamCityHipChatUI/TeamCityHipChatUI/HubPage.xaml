@@ -6,19 +6,16 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Self}}"
 	xmlns:data="using:TeamCityHipChatUI.DataModel"
+	xmlns:sys="using:System"
+	xmlns:e="using:TeamCityHipChatUI"
 	xmlns:converters="using:TeamCityHipChatUI.Converters"
-	xmlns:system="using:System"
-	d:DataContext="{Binding Source={d:DesignData Source=/DataModel/JsonData.json, Type=data:HubDataSource}}"
-    mc:Ignorable="d">
+	mc:Ignorable="d"
+	d:DataContext="{Binding Source={d:DesignData Source=/DataModel/JsonData.json, Type=data:HubDataSource}}">
 
     <Page.Resources>
         <DataTemplate x:Key="HubSectionHeaderTemplate">
             <TextBlock Margin="0,0,0,-9.5" Text="{Binding}"/>
         </DataTemplate>
-
-		<x:String x:Key="strConfig">Build</x:String>
-		
-		<converters:StatusMessageToImagePathConverter x:Key="ItemStateToImagePathConverter"/>
 		
         <DataTemplate x:Key="ConfigurationItemTemplate">
             <Grid Margin="0,10">
@@ -26,11 +23,18 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-
+				
 				<!--<Border Background="{ThemeResource ListViewItemPlaceholderBackgroundThemeBrush}"-->
                 <Border Margin="0,9.5,0,0" Grid.Column="0" HorizontalAlignment="Left">
-					<Image x:Name="ImageTemplate" Source="{Binding LastKnownState, Converter={StaticResource ItemStateToImagePathConverter}, ConverterParameter={StaticResource strConfig}, Mode=OneWay}"
-						   Stretch="UniformToFill" AutomationProperties.Name="{Binding Title}" Height="79" Width="79"/>
+					<Image x:Name="ImageTemplate"
+					       Stretch="UniformToFill" AutomationProperties.Name="{Binding Title}" Height="79" Width="79">
+						<Image.Resources>
+							<converters:StatusMessageToImagePathConverter x:Key="StatusMessageToImagePathConverter" ItemType="{Binding Title}"/>
+						</Image.Resources>
+						<Image.Source>
+							<Binding Path="LastKnownState" Converter="{StaticResource StatusMessageToImagePathConverter}" Mode="OneWay" />
+						</Image.Source>
+					</Image>
                 </Border>
                 <StackPanel Grid.Column="1" Margin="14.5,0,0,0">
                     <TextBlock Text="{Binding Title}" Style="{ThemeResource ListViewItemTextBlockStyle}"/>
