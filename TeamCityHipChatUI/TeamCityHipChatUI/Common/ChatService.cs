@@ -45,7 +45,6 @@ namespace TeamCityHipChatUI.Common
 
 		public async Task<StatusMessage> GetStatusMessageAsync(string configuration)
 		{
-			// get recent room message history
 			IResponse<RoomItems<Message>> jsonHistory =
 				await this.hipChatClient.Rooms.GetHistoryAsync(RoomName);
 
@@ -68,31 +67,36 @@ namespace TeamCityHipChatUI.Common
 
 		private async Task<StatusMessage> GetStatusMessage(string jsonHistory, string configuration)
 		{
+			Guard.NotNullOrEmpty(() => jsonHistory, jsonHistory);
+
 			RoomItems<Message> roomItems =
 				await
 					Task.Factory.StartNew(() => JsonConvert.DeserializeObject<RoomItems<Message>>(jsonHistory));
 
-			//roomItems.MaxResults = "10005";
-
 			return
-				roomItems.Items.Where(x => IsTeamCityUser(x))
+				roomItems.Items.Where(message => IsTeamCityUser(message.From))
 					.Reverse()
-					.FirstOrDefault(
-						x =>
-							x.MessageText.StartsWith(GetStatusNotification(configuration)) &&
-							Extensions.GetMessageArguments(x)[1] != "none")
+					.FirstOrDefault(message => IsNotification(message, configuration))
 					.ToStatusObject();
 		}
 
-		private static dynamic IsTeamCityUser(Message x)
+		private static dynamic IsTeamCityUser(dynamic @from)
 		{
 			// if TeamCity user was mentioned in HipChat by someone else, it's not TeamCity => ignore
-			if (x.From.GetType() == typeof(JObject))
+			if (@from.GetType() == typeof(JObject))
 			{
 				return false;
 			}
 
-			return x.From == TeamCityUserName;
+			return @from == TeamCityUserName;
+		}
+
+		private bool IsNotification(IMessage message, string configuration)
+		{
+			string notificationForConfig = GetStatusNotification(configuration);
+
+			return message.MessageText.StartsWith(notificationForConfig) &&
+			       Extensions.GetStatusAsString(message) != "none";
 		}
 
 		private string GetStatusNotification(string configuration)

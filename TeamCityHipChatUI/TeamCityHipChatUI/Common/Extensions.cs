@@ -34,10 +34,45 @@ namespace TeamCityHipChatUI.Common
 				return new StatusMessage(Status.Invalid, State.Invalid);
 			}
 
-			// @clients status dev success,idle
-			string[] args = GetMessageArguments(message);
+			return new StatusMessage(GetStatus(message), GetState(message));
+		}
 
-			return new StatusMessage(GetStatus(args[0]), GetState(args[1]));
+		public static string GetStatusAsString(IMessage message)
+		{
+			return GetMessageArguments(message)[0];
+		}
+
+		public static string GetStateAsString(IMessage message)
+		{
+			return GetMessageArguments(message)[1];
+		}
+
+		#region Private Methods
+
+		private static Status GetStatus(IMessage message)
+		{
+			string value = GetStatusAsString(message);
+
+			Status status;
+			if (Enum.TryParse(value, true, out status))
+			{
+				return status;
+			}
+
+			return Status.Invalid;
+		}
+
+		private static State GetState(IMessage message)
+		{
+			string value = GetStateAsString(message);
+
+			State state;
+			if (Enum.TryParse(value, true, out state))
+			{
+				return state;
+			}
+
+			return State.Invalid;
 		}
 
 		/// <summary>
@@ -48,33 +83,9 @@ namespace TeamCityHipChatUI.Common
 		/// </summary>
 		/// <param name="message"></param>
 		/// <returns></returns>
-		public static string[] GetMessageArguments(Message message)
+		private static string[] GetMessageArguments(IMessage message)
 		{
 			return message.MessageText.Split(' ')[3].Split(',');
-		}
-
-		#region Private Methods
-
-		private static Status GetStatus(string value)
-		{
-			Status status;
-			if (Enum.TryParse(value, true, out status))
-			{
-				return status;
-			}
-
-			return Status.Invalid;
-		}
-
-		private static State GetState(string value)
-		{
-			State state;
-			if (Enum.TryParse(value, true, out state))
-			{
-				return state;
-			}
-
-			return State.Invalid;
 		}
 
 		#endregion

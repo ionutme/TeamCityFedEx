@@ -114,13 +114,23 @@ namespace TeamCityHipChatUI
 			await ShowMessageDialogToContinue();
 		}
 
+		/// <summary>
+		/// Refresh the status of the current configuration event.
+		/// </summary>
+		/// <param name="sender">The source of the event.</param>
+		/// <param name="e">Event arguments.</param>
+		private async void SyncButton_OnClick(object sender, RoutedEventArgs e)
+		{
+			await SetStatus();
+		}
+
 		#region Message Dialog Methods
 
 		private async Task ShowMessageDialogToContinue()
 		{
 			var messageDialog = new MessageDialog(GetConfirmationMessage(), "Continue");
 			messageDialog.Commands.Add(new UICommand("Yes", YesCommandInvokedHandler));
-			messageDialog.Commands.Add(new UICommand("Cancel", CancelCommandInvokedHandler));
+			messageDialog.Commands.Add(new UICommand("Cancel"));
 
 			// Set the command that will be invoked by default
 			messageDialog.DefaultCommandIndex = 0;
@@ -133,14 +143,23 @@ namespace TeamCityHipChatUI
 
 		private async void YesCommandInvokedHandler(IUICommand command)
 		{
+			this.RefreshProgressRing.IsActive = true;
+			this.SyncButton.IsEnabled = false;
+
 			await SendRunCommand();
 
-			this.RunButton.IsEnabled = false;
-		}
+			// start counting once every 10 seconds
+			Countdown(
+				10,
+				TimeSpan.FromSeconds(1),
+				counter => this.CounterLabel.Text = counter.ToString(),
+				async () =>
+				{
+					await SetStatus();
+					this.RefreshProgressRing.IsActive = false;
 
-		private async void CancelCommandInvokedHandler(IUICommand command)
-		{
-			// do nothing
+					this.SyncButton.IsEnabled = true;
+				});
 		}
 
 		private string GetConfirmationMessage()
@@ -165,57 +184,22 @@ namespace TeamCityHipChatUI
 		{
 			StatusMessage message = await chatService.GetStatusMessageAsync(this.item.Configuration);
 
-			this.item.LastKnownState = message;
+			UpdateItemLastKnownState(message);
 
 			if (IsInvalidMessage(message))
 			{
 				DisableAllContent();
-				return;
-			}
-
-			SetStateLabelText(message.State);
-			SetStateLabelColor(message.Status);
-
-			ToggleEnableDisableRunButton(message.State);
-		}
-
-		private void SetStateLabelText(State state)
-		{
-			this.StateValue.Text = state.ToString();
-		}
-
-		private void SetStateLabelColor(Status status)
-		{
-			if (IsFailed(status))
-			{
-				this.StateValue.Foreground = new SolidColorBrush(Colors.Red);
 			}
 			else
 			{
-				this.StateValue.Foreground = new SolidColorBrush(Colors.DarkSeaGreen);
+				// TODO: enable all content
+				SetStateLabelText(message.State);
 			}
 		}
 
-		private void ToggleEnableDisableRunButton(State state)
+		private void UpdateItemLastKnownState(StatusMessage message)
 		{
-			if (IsRunning(state))
-			{
-				this.RunButton.IsEnabled = false;
-			}
-			else
-			{
-				this.RunButton.IsEnabled = true;
-			}
-		}
-
-		private bool IsFailed(Status status)
-		{
-			return status == Status.Failed;
-		}
-
-		private bool IsRunning(State state)
-		{
-			return state == State.Running;
+			this.item.LastKnownState = message;
 		}
 
 		private bool IsInvalidMessage(StatusMessage message)
@@ -228,31 +212,58 @@ namespace TeamCityHipChatUI
 			return message.Status == Status.Invalid || message.State == State.Invalid;
 		}
 
+		private void SetStateLabelText(State state)
+		{
+			this.StateValueLabel.Text = state.ToString();
+		}
+
 		private void DisableAllContent()
 		{
 			this.RunButton.IsEnabled = false;
-			this.DescriptionText.Foreground = new SolidColorBrush(Colors.DarkGray);
-			this.StatusText.Foreground = new SolidColorBrush(Colors.DarkGray);
-			this.StateValue.Text = "not available";
+
+			Brush disabledForegroundBrush = Resources["DisabledForeground"] as Brush;
+			this.DescriptionLabel.Foreground = disabledForegroundBrush;
+			this.StatusLabel.Foreground = disabledForegroundBrush;
+
+			this.StateValueLabel.Text = "not available";
+		}
+
+		private void Countdown(int count, TimeSpan interval, Action<int> refreshAction, Action stopAction)
+		{
+			var timer = new DispatcherTimer { Interval = interval };
+			timer.Tick += (sender, eventArgs) =>
+			{
+				if (count-- == 0)
+				{
+					timer.Stop();
+					stopAction();
+				}
+				else
+				{
+					refreshAction(count);
+				}
+			};
+
+			refreshAction(count);
+
+			timer.Start();
 		}
 
 		#endregion
 
 		#region Constants and Fields
 
-		private readonly ObservableDictionary defaultViewModel = new ObservableDictionary();
-
 		private static ChatService chatService;
 
 		private readonly NavigationHelper navigationHelper;
 
-		private ConfigurationItem item;
+		private readonly ObservableDictionary defaultViewModel = new ObservableDictionary();
 
-		private DateTime lastTimeStatusChecked;
+		private ConfigurationItem item;
 
 		#endregion
 
-		#region NavigationHelper registration
+		#region NavigationHelper Registration
 
 		/// <summary>
 		///     The methods provided in this section are simply used to allow

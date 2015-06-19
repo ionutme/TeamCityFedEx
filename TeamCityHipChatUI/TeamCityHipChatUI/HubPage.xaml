@@ -64,20 +64,9 @@
 		</HubSection>
 		
 		<!--SECTION 2-->
-		<HubSection x:Uid="AboutSection" Header="About">
+		<HubSection x:Uid="AboutSection" Header="About" >
 			<DataTemplate>
-				<TextBlock>
-					<TextBlock.Text>
-						Credits to AIDA WS team.
-							
-							asdfasdf
-							as
-							df
-							asdf
-							as
-							asass
-					</TextBlock.Text>
-				</TextBlock>
+				<TextBlock x:Name="TextBlockAbout"/>
 			</DataTemplate>
 		</HubSection>
 

@@ -1,7 +1,5 @@
 ﻿#region Using Directives
 
-
-
 #endregion
 
 namespace TeamCityHipChatUI.DataModel
@@ -11,9 +9,7 @@ namespace TeamCityHipChatUI.DataModel
 	/// </summary>
 	public class ConfigurationItem : ConfigurationBase
 	{
-		private string imagePath;
-
-		private StatusMessage lastKnownState;
+		#region Constructor
 
 		public ConfigurationItem(
 			string uniqueId,
@@ -26,10 +22,11 @@ namespace TeamCityHipChatUI.DataModel
 		{
 			Content = content;
 			Configuration = configuration;
-
-			// set a default value for the image path
-			this.imagePath = string.Format("Assets/{0}White.png", Configuration);
 		}
+
+		#endregion
+
+		#region Properties
 
 		public string Configuration { get; private set; }
 
@@ -60,5 +57,15 @@ namespace TeamCityHipChatUI.DataModel
 				OnPropertyChanged();
 			}
 		}
+
+		#endregion
+
+		#region Private Fields
+
+		private string imagePath;
+
+		private StatusMessage lastKnownState;
+
+		#endregion
 	}
 }
