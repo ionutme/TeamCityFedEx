@@ -11,7 +11,7 @@
         "Configuration" :  "dev",
         "Title": "Build",
         "Subtitle": "Item Subtitle: 1",
-        "Description" : "Start the Build on TC build machine",
+        "Description" : "Start the build machine",
         "Content": "The Build Configuration is a 'type of build', a set of settings edited within the TeamCity UI and which are used to start a build and group the sequence of the builds. The settings include VCS settings (from where to checkout sources for the build), what build procedure to run (build steps and environment parameters), triggers (when to start a new build) and others. This build configuration referes to AIDA-WS project."
       },
       {

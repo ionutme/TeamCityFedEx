@@ -66,7 +66,14 @@
 		<!--SECTION 2-->
 		<HubSection x:Uid="AboutSection" Header="About" >
 			<DataTemplate>
-				<TextBlock x:Name="TextBlockAbout"/>
+				<TextBlock x:Name="TextBlockAbout" Style="{ThemeResource BodyTextBlockStyle}">
+					All credits to AIDA WS team and iQuest.
+					This windows phone application was built for FedEx Day. 
+					The aim of a FedEx Day is to complete something deliverable within a 24 h period.
+					This enforced deadline is how the event gets its name; it mimics the bold, even revolutionary promise of an overnight delivery by the US-based courier FedEx. The idea is that if you can’t make it, at least make the effort. There may be a chance to complete the project later.
+					Read more at the following link:<LineBreak/>
+					<Hyperlink>https://blog.ambientia.fi/2011/08/12/fedex-day-whats-it-all-about/</Hyperlink>
+				</TextBlock>
 			</DataTemplate>
 		</HubSection>
 

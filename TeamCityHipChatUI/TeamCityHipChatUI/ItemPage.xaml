@@ -103,7 +103,7 @@
 
 			<!--REFRESH-->
 			<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-				<TextBlock Margin="0, 0, 17, 0"
+				<TextBlock Margin="1, 0, 15, 0"
 					Visibility="{Binding ElementName=RefreshProgressRing, Path=IsActive, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
 					VerticalAlignment="Center" Foreground="{StaticResource BackForeground}" Style="{ThemeResource BaseTextBlockStyle}">
 					auto refresh in...
