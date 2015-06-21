@@ -9,7 +9,7 @@ using Windows.UI.Xaml.Data;
 
 namespace TeamCityHipChatUI.Converters
 {
-	public class LogicAndConverter : IValueConverter
+	public class LogicAndNegatedConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, string language)
 		{

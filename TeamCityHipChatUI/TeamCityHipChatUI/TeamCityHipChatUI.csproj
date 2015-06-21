@@ -91,7 +91,7 @@
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\InverseVisibilityConverter.cs" />
     <Compile Include="Converters\LoadingTextToVisibilityConverter.cs" />
-    <Compile Include="Converters\LogicAndConverter.cs" />
+    <Compile Include="Converters\LogicAndNegatedConverter.cs" />
     <Compile Include="Converters\ShortDateTimeConverter.cs" />
     <Compile Include="Converters\VisibilityToBooleanConverter.cs" />
     <Compile Include="Converters\StatusToColorBrushConverter.cs" />

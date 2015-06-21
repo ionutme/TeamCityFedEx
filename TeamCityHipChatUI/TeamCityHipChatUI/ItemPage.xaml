@@ -1,4 +1,4 @@
-﻿<Page x:Name="pageRoot"
+﻿<Page x:Name="PageRoot"
       x:Class="TeamCityHipChatUI.ItemPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -32,7 +32,7 @@
 		<converters:StatusToColorBrushConverter x:Key="StatusToColorConverter" />
 		<converters:LoadingTextToVisibilityConverter x:Key="LoadingTextToVisibilityConverter" />
 		<converters:ShortDateTimeConverter x:Key="ShortDateTimeConverter" />
-		<converters:LogicAndConverter x:Key="LogicAndConverter" />
+		<converters:LogicAndNegatedConverter x:Key="LogicAndNegatedConverter" />
 
 		<Brush x:Key="UnfocusedForeground">LightGray</Brush>
 		<Brush x:Key="DisabledForeground">DarkGray</Brush>
@@ -52,10 +52,10 @@
 		</Grid.RowDefinitions>
 
 		<!-- HEADER -->
-		<StackPanel Grid.Row="0" Margin="19,0,0,0">
+		<StackPanel Grid.Row="0" Margin="19, 0, 0, 0">
 			<TextBlock x:Uid="Header" Text="Team City Hip Chat" Style="{ThemeResource TitleTextBlockStyle}" Margin="0,12,0,0" />
 			<StackPanel Orientation="Horizontal">
-				<TextBlock Text="{Binding Title, Mode=OneTime}" Style="{ThemeResource HeaderTextBlockStyle}" Margin="0,-6.5,0,26.5"
+				<TextBlock Text="{Binding Title, Mode=OneTime}" Style="{ThemeResource HeaderTextBlockStyle}" Margin="0,-6.5,0,10"
 				           CharacterSpacing="{ThemeResource PivotHeaderItemCharacterSpacing}" />
 			</StackPanel>
 		</StackPanel>
@@ -88,14 +88,13 @@
 
 			<!--DESCRIPTION-->
 			<TextBlock x:Name="DescriptionLabel" Text="{Binding Content, Mode=OneTime}"
-			           Style="{ThemeResource BodyTextBlockStyle}"
-			           Height="200" Margin="0, 0, 0, 15" />
+			           Style="{ThemeResource BodyTextBlockStyle}" Height="270" />
 
 			<!--RUN-->
 			<Button x:Uid="RunButton" x:Name="RunButton" Content="RUN"
 			        Background="{StaticResource ButtonBackgroundThemeBrush}" Click="RunButton_OnClick">
 				<interactivity:Interaction.Behaviors>
-					<i:MultiBindingBehavior PropertyName="IsEnabled" Converter="{StaticResource LogicAndConverter}" Mode="OneWay">
+					<i:MultiBindingBehavior PropertyName="IsEnabled" Converter="{StaticResource LogicAndNegatedConverter}" Mode="OneWay">
 						<i:MultiBindingItem Value="{Binding ElementName=RefreshProgressRing, Path=IsActive, Mode=OneWay}"/>
 						<i:MultiBindingItem Value="{Binding ElementName=BuildProgressBar,  Path=Visibility, Converter={StaticResource VisibilityToBoolConverter}, Mode=OneWay}"/>
 					</i:MultiBindingBehavior>
@@ -103,11 +102,11 @@
 			</Button>
 
 			<!--REFRESH-->
-			<StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="30, 0">
-				<TextBlock
+			<StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+				<TextBlock Margin="0, 0, 17, 0"
 					Visibility="{Binding ElementName=RefreshProgressRing, Path=IsActive, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"
 					VerticalAlignment="Center" Foreground="{StaticResource BackForeground}" Style="{ThemeResource BaseTextBlockStyle}">
-					refreshing in...
+					auto refresh in...
 				</TextBlock>
 				<ProgressRing x:Name="RefreshProgressRing" IsActive="False" Margin="10, 0, 0, 0" />
 				<TextBlock x:Name="CounterLabel" Foreground="{StaticResource BackForeground}"
@@ -117,7 +116,7 @@
 			</StackPanel>
 		</StackPanel>
 	</Grid>
-	
+
 	<!-- BOTTOM APPLICATIONS BAR -->
 	<Page.BottomAppBar>
 		<CommandBar ClosedDisplayMode="Compact">
