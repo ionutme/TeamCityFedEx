@@ -10,7 +10,9 @@
       xmlns:data="using:TeamCityHipChatUI.DataModel"
       xmlns:converters="using:TeamCityHipChatUI.Converters"
       d:DataContext="{Binding Groups[0].Items[0], Source={d:DesignData Source=/DataModel/JsonData.json, Type=data:HubDataSource}}"
-      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+	  xmlns:i="using:Cimbalino.Toolkit.Behaviors"
+	  xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
+	  Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 	<Page.Transitions>
 		<TransitionCollection>
 			<NavigationThemeTransition>
@@ -26,13 +28,16 @@
 		<converters:BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 		<converters:InverseBooleanConverter x:Key="InverseBoolConverter" />
 		<converters:InverseVisibilityConverter x:Key="InverseVisibilityConverter" />
+		<converters:VisibilityToBooleanConverter x:Key="VisibilityToBoolConverter" />
 		<converters:StatusToColorBrushConverter x:Key="StatusToColorConverter" />
 		<converters:LoadingTextToVisibilityConverter x:Key="LoadingTextToVisibilityConverter" />
 		<converters:ShortDateTimeConverter x:Key="ShortDateTimeConverter" />
+		<converters:LogicAndConverter x:Key="LogicAndConverter" />
 
 		<Brush x:Key="UnfocusedForeground">LightGray</Brush>
-		<Brush x:Key="BackForeground">DimGray</Brush>
 		<Brush x:Key="DisabledForeground">DarkGray</Brush>
+		<Brush x:Key="BackForeground">DimGray</Brush>
+
 	</Page.Resources>
 
 	<Grid x:Name="LayoutRoot">
@@ -87,13 +92,17 @@
 			           Height="200" Margin="0, 0, 0, 15" />
 
 			<!--RUN-->
-			<Button x:Uid="RunButton" x:Name="RunButton"
-			        IsEnabled="{Binding ElementName=RefreshProgressRing, Path=IsActive, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}"
+			<Button x:Uid="RunButton" x:Name="RunButton" Content="RUN"
 			        Background="{StaticResource ButtonBackgroundThemeBrush}" Click="RunButton_OnClick">
-				RUN
+				<interactivity:Interaction.Behaviors>
+					<i:MultiBindingBehavior PropertyName="IsEnabled" Converter="{StaticResource LogicAndConverter}" Mode="OneWay">
+						<i:MultiBindingItem Value="{Binding ElementName=RefreshProgressRing, Path=IsActive, Mode=OneWay}"/>
+						<i:MultiBindingItem Value="{Binding ElementName=BuildProgressBar,  Path=Visibility, Converter={StaticResource VisibilityToBoolConverter}, Mode=OneWay}"/>
+					</i:MultiBindingBehavior>
+				</interactivity:Interaction.Behaviors>
 			</Button>
 
-			<!--REFRESHING-->
+			<!--REFRESH-->
 			<StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="30, 0">
 				<TextBlock
 					Visibility="{Binding ElementName=RefreshProgressRing, Path=IsActive, Converter={StaticResource BoolToVisibilityConverter}, Mode=OneWay}"

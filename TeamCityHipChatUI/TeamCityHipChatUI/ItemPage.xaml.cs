@@ -146,18 +146,18 @@ namespace TeamCityHipChatUI
 			this.RefreshProgressRing.IsActive = true;
 			this.SyncButton.IsEnabled = false;
 
-			await SendRunCommand();
+			//await SendRunCommand();
+			await Task.Delay(3000);
 
-			// start counting once every 10 seconds
+			// start counting once every 9 seconds
 			Countdown(
-				10,
+				9,
 				TimeSpan.FromSeconds(1),
 				counter => this.CounterLabel.Text = counter.ToString(),
 				async () =>
 				{
 					await SetStatus();
 					this.RefreshProgressRing.IsActive = false;
-
 					this.SyncButton.IsEnabled = true;
 				});
 		}
@@ -233,7 +233,7 @@ namespace TeamCityHipChatUI
 			var timer = new DispatcherTimer { Interval = interval };
 			timer.Tick += (sender, eventArgs) =>
 			{
-				if (count-- == 0)
+				if (count-- == 1)
 				{
 					timer.Stop();
 					stopAction();

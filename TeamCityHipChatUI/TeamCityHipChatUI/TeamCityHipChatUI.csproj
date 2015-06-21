@@ -91,7 +91,9 @@
     <Compile Include="Converters\InverseBooleanConverter.cs" />
     <Compile Include="Converters\InverseVisibilityConverter.cs" />
     <Compile Include="Converters\LoadingTextToVisibilityConverter.cs" />
+    <Compile Include="Converters\LogicAndConverter.cs" />
     <Compile Include="Converters\ShortDateTimeConverter.cs" />
+    <Compile Include="Converters\VisibilityToBooleanConverter.cs" />
     <Compile Include="Converters\StatusToColorBrushConverter.cs" />
     <Compile Include="DataModel\ConfigurationItem.cs" />
     <Compile Include="DataModel\ConfigurationGroup.cs" />
@@ -184,6 +186,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Cimbalino.Toolkit">
+      <HintPath>..\packages\Cimbalino.Toolkit.1.2.7\lib\wpa81\Cimbalino.Toolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="Cimbalino.Toolkit.Core">
+      <HintPath>..\packages\Cimbalino.Toolkit.Core.1.2.7\lib\wpa81\Cimbalino.Toolkit.Core.dll</HintPath>
+    </Reference>
     <Reference Include="HipChat.Net">
       <HintPath>..\packages\HipChat.Net.Portable.0.1.2\lib\portable-net45+win+wpa81\HipChat.Net.dll</HintPath>
     </Reference>
@@ -193,6 +201,11 @@
     <Reference Include="System.Net.Http.Extensions">
       <HintPath>..\packages\Microsoft.Net.Http.2.2.20\lib\wpa81\System.Net.Http.Extensions.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <SDKReference Include="BehaviorsXamlSDKManaged, version=12.0">
+      <Name>Behaviors SDK %28XAML%29</Name>
+    </SDKReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
