@@ -146,8 +146,7 @@ namespace TeamCityHipChatUI
 			this.RefreshProgressRing.IsActive = true;
 			this.SyncButton.IsEnabled = false;
 
-			//await SendRunCommand();
-			await Task.Delay(3000);
+			await SendRunCommand();
 
 			// start counting once every 9 seconds
 			Countdown(

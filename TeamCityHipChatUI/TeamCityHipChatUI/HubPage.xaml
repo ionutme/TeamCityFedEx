@@ -7,7 +7,6 @@
 	DataContext="{Binding DefaultViewModel, RelativeSource={RelativeSource Self}}"
 	xmlns:data="using:TeamCityHipChatUI.DataModel"
 	xmlns:sys="using:System"
-	xmlns:e="using:TeamCityHipChatUI"
 	xmlns:converters="using:TeamCityHipChatUI.Converters"
 	mc:Ignorable="d"
 	d:DataContext="{Binding Source={d:DesignData Source=/DataModel/JsonData.json, Type=data:HubDataSource}}">
